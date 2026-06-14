@@ -1,5 +1,5 @@
 import { db } from "@/config/db";
-import { chatTable, frameTable } from "@/config/schema";
+import { chatTable, frameTable,projectTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -19,15 +19,21 @@ export async function GET(req:NextRequest){
     .from(frameTable)
     .where(eq(frameTable.frameId,frameId))
 
+    const projectResult = await db
+  .select()
+  .from(projectTable)
+  .where(eq(projectTable.projectId, projectId!));
+
     const chatResult=await db
     .select()
     .from(chatTable)
     .where(eq(chatTable.frameId,frameId))
 
-    const finalResult={
+    const finalResult = {
         ...frameResult[0],
-        chatMessages: chatResult[0]?.chatMessage ?? []
-        }
+        chatMessages: chatResult[0]?.chatMessage ?? [],
+        selectedModel: projectResult[0]?.selectedModel,
+      }
 
     return NextResponse.json(finalResult)
 }

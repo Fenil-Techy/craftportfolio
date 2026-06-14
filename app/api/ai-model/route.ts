@@ -1,40 +1,50 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
-
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages,
-      stream: true,
-    });
-
+    const { messages, model } = await req.json();
+    console.log("Backend received model:", model);
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          stream: true,
+          max_tokens: 12000,
+        }),
+      }
+    );
+    
+    if (!response.ok) {
+      const error = await response.text();
+      console.log(error);
+    
+      return new Response(error, {
+        status: response.status,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+    
+    // ONLY if response.ok
+    const reader = response.body!.getReader();
     const encoder = new TextEncoder();
 
     const readable = new ReadableStream({
       async start(controller) {
-        for await (const chunk of stream) {
-          const text = chunk.choices?.[0]?.delta?.content || "";
+        while (true) {
+          const { done, value } = await reader.read();
 
-          const data = `data: ${JSON.stringify({
-            choices: [
-              {
-                delta: {
-                  content: text,
-                },
-              },
-            ],
-          })}\n\n`;
+          if (done) break;
 
-          controller.enqueue(encoder.encode(data));
+          controller.enqueue(value);
         }
 
-        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
       },
     });
@@ -47,7 +57,7 @@ export async function POST(req: Request) {
       },
     });
   } catch (error) {
-    console.error("API error:", error);
+    console.error(error);
     return new Response("Error", { status: 500 });
   }
 }

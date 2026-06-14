@@ -9,12 +9,25 @@ import React, { useContext, useState } from 'react'
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { AI_MODELS } from '@/config/models';
+import Image from 'next/image';
 function Hero() {
   const router = useRouter()
   const [userInput, setUserInput] = useState<string>()
   const { user, isLoaded } = useUser()
   const [loading, setLoading] = useState(false)
   const context = useContext(UserDetailContext)
+  const [selectedModel, setSelectedModel] = useState(
+    "google/gemma-4-26b-a4b-it"
+  );
 
   if (!context) {
     throw new Error("UserDetailContext not provided")
@@ -43,7 +56,8 @@ function Hero() {
         projectId: projectId,
         frameId: frameId,
         messages: messages,
-        credits: userDetail?.credits
+        credits: userDetail?.credits,
+        model: selectedModel
       })
       console.log(result.data)
       toast.success('Project created')
@@ -93,7 +107,7 @@ function Hero() {
     },
   ];
   if (!isLoaded) {
-    return <div className='flex items-center justify-center h-[80vh]'><Loader/></div>
+    return <div className='flex items-center justify-center h-[80vh]'><Loader /></div>
   }
   return (
     <div className="relative flex flex-col items-center justify-center w-full min-h-[calc(100dvh-4rem)] lg:min-h-[80vh] px-4 sm:px-6 py-8 sm:py-12 text-center">
@@ -121,9 +135,51 @@ function Hero() {
           value={userInput}
         />
         <div className="flex justify-between items-center gap-2 mt-2">
-          <Button variant="default" size="icon-lg" className="shrink-0">
-            <ImagePlus />
-          </Button>
+          {/* Model Selector */}
+          <Select
+            value={selectedModel}
+            onValueChange={setSelectedModel}
+          >
+            <SelectTrigger
+              className="
+      w-[220px]
+      h-11
+      rounded-xl
+      border border-white/10
+      bg-zinc-900/80
+      backdrop-blur-md
+      text-white
+      shadow-lg
+      hover:bg-zinc-800
+      transition-all
+      duration-200
+      focus:ring-2
+      focus:ring-blue-500
+    "
+            >
+              <SelectValue placeholder="Select AI Model" />
+            </SelectTrigger>
+
+            <SelectContent className="rounded-xl bg-zinc-900 border border-white/10">
+              {AI_MODELS.map((model) => (
+                <SelectItem
+                  key={model.id}
+                  value={model.id}
+                  className="cursor-pointer py-2 rounded-lg data-highlighted:bg-blue-500/20"
+                >
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={model.logo}
+                      alt={model.name}
+                      width={20}
+                      height={20}
+                    />
+                    <span>{model.name}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {!user ? (
             <SignInButton mode="modal" forceRedirectUrl="/workspace">
               <Button disabled={!userInput} className="shrink-0">
