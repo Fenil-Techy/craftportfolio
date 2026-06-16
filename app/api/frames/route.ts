@@ -1,50 +1,99 @@
 import { db } from "@/config/db";
-import { chatTable, frameTable,projectTable } from "@/config/schema";
+import { chatTable, frameTable, projectTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 
-export async function GET(req:NextRequest){
-    const {searchParams}=new URL(req.url)
-    const frameId=searchParams.get('frameId')
-    const projectId=searchParams.get('projectId')
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url)
+    const frameId = searchParams.get('frameId')
+    const projectId = searchParams.get('projectId')
 
-    if(!frameId){
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
+
+    if (!email) {
         return NextResponse.json(
-            {error:"frameId is required"}, {status: 400 }
+            { error: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
+    if (!frameId) {
+        return NextResponse.json(
+            { error: "frameId is required" }, { status: 400 }
         )
     }
 
-    const frameResult=await db
-    .select()
-    .from(frameTable)
-    .where(eq(frameTable.frameId,frameId))
+    const frameResult = await db
+        .select()
+        .from(frameTable)
+        .where(eq(frameTable.frameId, frameId))
 
     const projectResult = await db
-  .select()
-  .from(projectTable)
-  .where(eq(projectTable.projectId, projectId!));
+        .select()
+        .from(projectTable)
+        .where(
+            and(
+                eq(projectTable.projectId, projectId!),
+                eq(projectTable.createdBy, email)
+            )
+        );
 
-    const chatResult=await db
-    .select()
-    .from(chatTable)
-    .where(eq(chatTable.frameId,frameId))
+    if (projectResult.length === 0) {
+        return NextResponse.json(
+            { error: "Forbidden" },
+            { status: 403 }
+        );
+    }
+
+
+    const chatResult = await db
+        .select()
+        .from(chatTable)
+        .where(eq(chatTable.frameId, frameId))
 
     const finalResult = {
         ...frameResult[0],
         chatMessages: chatResult[0]?.chatMessage ?? [],
         selectedModel: projectResult[0]?.selectedModel,
-      }
+    }
 
     return NextResponse.json(finalResult)
 }
 
-export async function PUT(req:NextRequest){
+export async function PUT(req: NextRequest) {
 
-    const {designCode,frameId,projectId}=await req.json()
+    const { designCode, frameId, projectId } = await req.json()
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
 
-    const result=await db.update(frameTable).set({
-        designCode:designCode
-    }).where(and(eq(frameTable.frameId,frameId),eq(frameTable.projectId,projectId)))
+    if (!email) {
+        return NextResponse.json(
+            { error: "Unauthorized" },
+            { status: 401 }
+        );
+    } 
+    const project = await db
+    .select()
+    .from(projectTable)
+    .where(
+      and(
+        eq(projectTable.projectId, projectId),
+        eq(projectTable.createdBy, email)
+      )
+    );
 
-    return NextResponse.json({result:"Updated"})
+  if (project.length === 0) {
+    return NextResponse.json(
+      { error: "Forbidden" },
+      { status: 403 }
+    );
+  }
+
+    const result = await db.update(frameTable).set({
+        designCode: designCode
+    }).where(and(eq(frameTable.frameId, frameId), eq(frameTable.projectId, projectId)))
+
+    return NextResponse.json({ result: "Updated" })
 }
