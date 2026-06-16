@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PlaygroundHeader from '../_components/PlaygroundHeader'
 import ChatSection from '../_components/ChatSection'
 import WebsiteDesign from '../_components/WebsiteDesign'
@@ -9,6 +9,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Sparkles } from 'lucide-react'
+import { Loader } from '@/components/ui/loader'
 
 export type Messages = {
   role: string,
@@ -21,7 +22,7 @@ export type Frame = {
   chatMessages: Messages[]
 }
 
-const prompt =`
+const prompt = `
 You are an elite Product Designer, Senior Frontend Engineer, and UI Architect.
 
 Your goal is to generate production-quality websites that rival designs from Stripe, Vercel, Linear, Framer, Apple, Notion, Raycast, and Airbnb.
@@ -334,6 +335,8 @@ Always finish with the final closing tag.
 
 `
 function Playground() {
+  console.log("Playground render");
+  const lastLengthRef = useRef(0);
   const [chatOpen, setChatOpen] = useState(false);
   const { projectId } = useParams()
   const params = useSearchParams()
@@ -344,9 +347,10 @@ function Playground() {
   const [screenSize, setScreenSize] = useState("desktop");
   const [selectedModel, setSelectedModel] = useState("google/gemma-4-26b-a4b-it");
   const [messages, setMessages] = useState<Messages[]>()
-
+  const [initialLoading, setInitialLoading] = useState(true);
   useEffect(() => {
     if (!frameId) return
+    setInitialLoading(true);
     void axios.get(`/api/frames?frameId=${frameId}&projectId=${projectId}`).then((result) => {
       console.log(result.data)
       setFrameDetail(result.data)
@@ -360,7 +364,7 @@ function Playground() {
           index >= 0
             ? designCode.slice(index + codeFence.length).trimStart()
             : designCode;
-        setGeneratedCode(formattedCode);
+            setGeneratedCode(() => formattedCode);
       } else {
         setGeneratedCode("");
       }
@@ -377,15 +381,15 @@ function Playground() {
         );
       }
       console.log("Loaded model:", result.data.selectedModel);
+      setInitialLoading(false)
     })
-
   }, [frameId, projectId])
 
   const SendMessage = async (
     userInput: string,
     modelToUse?: string
   ) => {
-
+    setLoading(true)
     const model = modelToUse ?? selectedModel;
 
     console.log("Using model:", model);
@@ -455,11 +459,19 @@ function Playground() {
               .replace(/^\s*\[\[MODE:(?:CODE|CHAT)\]\]\s*/, "");
             fullText = cleanedText;
 
+
+
             if (mode === "code") {
-              setGeneratedCode(cleanedText);
+              if (cleanedText.length - lastLengthRef.current > 500) {
+                lastLengthRef.current = cleanedText.length;
+                setGeneratedCode(cleanedText);
+              }
             }
           } catch { }
         }
+      }
+      if (mode === "code") {
+        setGeneratedCode(fullText);
       }
 
       // fallback when model misses marker
@@ -590,6 +602,7 @@ shadow-[0_20px_80px_rgba(0,0,0,0.45)]
                     onSend={(input: string) => SendMessage(input)}
                     loading={loading}
                   />
+                  
                 </div>
               </div>
             </>
@@ -597,6 +610,12 @@ shadow-[0_20px_80px_rgba(0,0,0,0.45)]
         </div>
         <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
           <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize} />
+            {initialLoading && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                <Loader />
+              </div>
+            )}
+          
         </main>
       </div>
     </div>
