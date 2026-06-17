@@ -76,7 +76,7 @@ export function AppSidebar() {
                     <>
                         <div className="flex gap-2 items-center">
                             <Image src="/logo.png" alt="logo" width={40} height={40} />
-                            <h2 className="font-bold text-xl">AI <span className='text-blue-400'>Craft</span><span className='text-purple-400'>Ship</span></h2>
+                            <h2 className="font-bold text-xl"><span className='text-blue-400'>Craft</span><span className='text-purple-400'>Portfolio</span></h2>
                         </div>
                     </>
                 ) : (

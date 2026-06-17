@@ -7,7 +7,7 @@ import { useContext, useEffect, useMemo, useState } from 'react'
 import { Download, MonitorIcon, Smartphone, SquareArrowOutUpRightIcon, Code2Icon, Save } from 'lucide-react'
 import { ViewCodeBlock } from './ViewCodeBlock'
 
-const HTML_CODE=`<!DOCTYPE html>
+const HTML_CODE = `<!DOCTYPE html>
       <html lang="en">
       <head>
           <meta charset="UTF-8" />
@@ -51,137 +51,158 @@ const HTML_CODE=`<!DOCTYPE html>
 {code}
 
       </html>`
-function PlaygroundHeader({screenSize,setScreenSize,code}:any) {
+function PlaygroundHeader({ screenSize, setScreenSize, code }: any) {
   console.log("Header render");
-const{onSave,setOnSave}=useContext(OnSaveContext)
-const finalCode = useMemo(() => {
-  return (HTML_CODE.replace("{code}", code) || "")
-    .replaceAll("```html", "")
-    .replace("```", "")
-    .replace("html", "");
-}, [code]);
-    const ViewInNewTab=()=>{
-        if(!finalCode) return 
+  const { onSave, setOnSave } = useContext(OnSaveContext)
+  // 1. Added safety state for loading status to fix compilation crash
+  const [isSaving, setIsSaving] = useState(false)
 
-        
-        const blob=new Blob([finalCode||""],{type:"text/html"})
-        const url=URL.createObjectURL(blob)
-        window.open(url,"_blank")
+  // Turn off loading animation briefly when onSave triggers complete
+  useEffect(() => {
+    if (onSave) {
+      const timer = setTimeout(() => setIsSaving(false), 800)
+      return () => clearTimeout(timer)
     }
-    const downloadButton=()=>{
-        const blob=new Blob([finalCode||""],{type:"text/html"})
-        const url=URL.createObjectURL(blob)
-        const a=document.createElement('a')
-        a.href=url;
-        a.download='index.html';
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
+  }, [onSave])
+  const finalCode = useMemo(() => {
+    return (HTML_CODE.replace("{code}", code) || "")
+      .replaceAll("```html", "")
+      .replace("```", "")
+      .replace("html", "");
+  }, [code]);
+  const ViewInNewTab = () => {
+    if (!finalCode) return
 
-    }
+
+    const blob = new Blob([finalCode || ""], { type: "text/html" })
+    const url = URL.createObjectURL(blob)
+    window.open(url, "_blank")
+  }
+  const downloadButton = () => {
+    const blob = new Blob([finalCode || ""], { type: "text/html" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+  }
+  const handleSaveTrigger = () => {
+    setIsSaving(true)
+    setOnSave(Date.now())
+  }
   return (
-    <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background/90 backdrop-blur-md px-2 sm:px-4">
+    <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background/90 backdrop-blur-md px-2 sm:px-4 md:p-8">
 
-  {/* Logo */}
-  <Link href="/workspace">
-    <div className="flex items-center gap-2">
-      <Image
-        src="/logo.png"
-        alt="logo"
-        width={40}
-        height={40}
-        className="h-8 w-8"
-      />
+      {/* Logo */}
+      <Link href="/workspace">
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="logo"
+            width={40}
+            height={40}
+            className="h-8 w-8"
+          />
 
-      <h2 className="hidden md:block text-lg font-bold">
-        AI
-        <span className="text-blue-400">Craft</span>
-        <span className="text-purple-400">Ship</span>
-      </h2>
-    </div>
-  </Link>
+          <h2 className="hidden md:block text-lg font-bold">
+            
+            <span className="text-blue-400 lg:text-xl">Craft</span>
+            <span className="text-purple-400 lg:text-xl">Portfolio</span>
+          </h2>
+        </div>
+      </Link>
 
-  {/* Actions */}
-  <div className="flex items-center gap-3 overflow-x-auto">
+      {/* Actions */}
+      <div className="flex items-center gap-3 overflow-x-auto">
 
-    {/* Desktop / Mobile */}
-    <div className="hidden lg:flex items-center rounded-md border p-1">
-    <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("desktop")} className={screenSize === "desktop" ? "border border-primary" : undefined} aria-label="Desktop preview">
-              <MonitorIcon />
+        {/* Desktop / Mobile */}
+        <div className="hidden lg:flex items-center rounded-md border p-1">
+          <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("desktop")} className={screenSize === "desktop" ? "border border-primary" : undefined} aria-label="Desktop preview">
+            <MonitorIcon />
+          </Button>
+          <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("mobile")} className={screenSize === "mobile" ? "border border-primary" : undefined} aria-label="Mobile preview">
+            <Smartphone />
+          </Button>
+        </div>
+
+        <Button
+          size="icon"
+          variant="outline"
+          className="sm:hidden"
+          onClick={ViewInNewTab}
+        >
+          <SquareArrowOutUpRightIcon className="h-4 w-4" />
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          className="hidden sm:flex"
+          onClick={ViewInNewTab}
+        >
+          <SquareArrowOutUpRightIcon className="h-4 w-4" />
+          View
+        </Button>
+        <ViewCodeBlock code={finalCode}>
+          <div>
+            <Button size="icon" variant="outline" className="sm:hidden border-slate-800 text-slate-300">
+              <Code2Icon className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("mobile")} className={screenSize === "mobile" ? "border border-primary" : undefined} aria-label="Mobile preview">
-              <Smartphone />
+
+            <Button size="sm" variant="outline" className="hidden sm:flex gap-1.5 border-slate-800 text-slate-200 hover:bg-slate-900">
+              <Code2Icon className="h-3.5 w-3.5 text-blue-400" />
+              Code
             </Button>
-    </div>
+          </div>
+        </ViewCodeBlock>
 
-    <Button
-  size="icon"
-  variant="outline"
-  className="sm:hidden"
-  onClick={ViewInNewTab}
->
-  <SquareArrowOutUpRightIcon className="h-4 w-4" />
-</Button>
+        {/* Download Actions */}
+        <Button
+          size="icon"
+          variant="outline"
+          className="sm:hidden border-slate-800 text-slate-300"
+          onClick={downloadButton}
+        >
+          <Download className="h-4 w-4" />
+        </Button>
 
-<Button
-  size="sm"
-  variant="outline"
-  className="hidden sm:flex"
-  onClick={ViewInNewTab}
->
-  <SquareArrowOutUpRightIcon className="h-4 w-4" />
-  View
-</Button>
-<ViewCodeBlock code={finalCode}>
-    <div>
-    <Button size="icon" className="sm:hidden">
-      <Code2Icon className="h-4 w-4" />
-    </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="hidden sm:flex gap-1.5 border-slate-800 text-slate-200 hover:bg-slate-900"
+          onClick={downloadButton}
+        >
+          <Download className="h-3.5 w-3.5 text-purple-400" />
+          Download
+        </Button>
 
-    <Button size="sm" className="hidden sm:flex">
-      <Code2Icon className="h-4 w-4" />
-      Code
-    </Button>
-    </div>
-</ViewCodeBlock>
+        <Button
+          size="icon"
+          className="sm:hidden"
+          disabled={isSaving}
+          onClick={handleSaveTrigger}
+        >
+          <Save className="h-4 w-4" />
+        </Button>
 
-<Button
-  size="icon"
-  className="sm:hidden"
-  onClick={downloadButton}
->
-  <Download className="h-4 w-4" />
-</Button>
+        <Button
+          size="sm"
+          className="hidden sm:flex"
+          disabled={isSaving}
+          onClick={handleSaveTrigger}
+        >
+          <Save className={`h-3.5 w-3.5 ${isSaving ? "animate-spin" : ""}`} />
+          {isSaving ? "Saving..." : "Save"}
+          
+         
+        </Button>
 
-<Button
-  size="sm"
-  className="hidden sm:flex"
-  onClick={downloadButton}
->
-  <Download className="h-4 w-4" />
-  Download
-</Button>
-
-<Button
-  size="icon"
-  className="sm:hidden"
-  onClick={() => setOnSave(Date.now())}
->
-  <Save className="h-4 w-4" />
-</Button>
-
-<Button
-  size="sm"
-  className="hidden sm:flex"
-  onClick={() => setOnSave(Date.now())}
->
-  <Save className="h-4 w-4" />
-  Save
-</Button>
-   
-  </div>
-</header>
+      </div>
+    </header>
   )
 }
 

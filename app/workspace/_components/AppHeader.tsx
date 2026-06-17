@@ -15,11 +15,7 @@ function AppHeader() {
             Pricing
           </Button>
         </Link>
-        <Link href="/contact">
-          <Button variant="ghost" className="text-sm text-gray-300 px-3 py-2 hover:bg-zinc-800 hover:text-white sm:text-base sm:p-3">
-            Contact
-          </Button>
-        </Link>
+        
       </div>
       <UserButton />
     </div>

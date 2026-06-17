@@ -18,28 +18,24 @@ function Header() {
     {
       name: 'Pricing',
       href: '/pricing'
-    },
-    {
-      name: 'Contact',
-      href: '/contact'
     }
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full shadow bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:w-[90%] xl:w-[80%]">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6  lg:w-[90%] xl:w-[80%]">
 
         {/* logo & name */}
         <Link href="/" className="flex min-w-0 items-center gap-2">
           <Image
             src="/logo.png"
             alt="logo"
-            width={50}
-            height={50}
-            className="h-7 w-7 shrink-0 sm:h-9 sm:w-9 lg:h-12 lg:w-12"
+            width={40}
+            height={40}
+            className="h-7 w-7 shrink-0 sm:h-9 sm:w-9 lg:h-10 lg:w-10"
           />
-          <h2 className="truncate text-sm font-bold text-white sm:text-base md:text-xl lg:text-2xl">
-            AI <span className="text-blue-400">Craft</span><span className="text-purple-400">Ship</span>
+          <h2 className="truncate text-sm font-bold text-white sm:text-base md:text-xl lg:text-xl">
+            <span className="text-blue-400">Craft</span><span className="text-purple-400">Portfolio</span>
           </h2>
         </Link>
 
