@@ -52,7 +52,7 @@ const HTML_CODE = `<!DOCTYPE html>
 
       </html>`
 function PlaygroundHeader({ screenSize, setScreenSize, code }: any) {
-  console.log("Header render");
+  
   const { onSave, setOnSave } = useContext(OnSaveContext)
   // 1. Added safety state for loading status to fix compilation crash
   const [isSaving, setIsSaving] = useState(false)

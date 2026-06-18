@@ -1,7 +1,7 @@
 export async function POST(req: Request) {
   try {
     const { messages, model } = await req.json();
-    console.log("Backend received model:", model);
+   
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {

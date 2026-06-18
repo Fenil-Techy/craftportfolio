@@ -45,7 +45,7 @@ const HTML_CODE = `
     `
 
 function WebsiteDesign({ generatedCode ,screenSize }: Props) {
-    console.log("Website render");
+   
     
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
     const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null)

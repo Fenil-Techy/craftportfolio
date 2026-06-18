@@ -368,7 +368,7 @@ function Playground() {
     if (!frameId) return
     setInitialLoading(true);
     void axios.get(`/api/frames?frameId=${frameId}&projectId=${projectId}`).then((result) => {
-      console.log(result.data)
+      
       setFrameDetail(result.data)
       const designCode = result.data?.designCode;
       const hasStoredDesignCode =
@@ -396,7 +396,7 @@ function Playground() {
           result.data.selectedModel
         );
       }
-      console.log("Loaded model:", result.data.selectedModel);
+     
       setInitialLoading(false)
     })
   }, [frameId, projectId])
@@ -589,7 +589,7 @@ function Playground() {
       designCode: code,
       frameId: frameId, projectId: projectId
     })
-    console.log(result.data)
+    
     toast.success("website is ready")
   }
 
