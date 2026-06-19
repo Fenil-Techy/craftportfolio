@@ -40,14 +40,26 @@ export function AppSidebar() {
     const hasUnlimitedAcess = has({ plan: 'pro' })
 
     useEffect(() => {
-        const cached = localStorage.getItem("projects")
-        if (cached) {
-            setProjectList(JSON.parse(cached))
-            // eslint-disable-next-line react-hooks/immutability
-            getProjectList(false)
+        // 3.5 — TTL cache: treat entries older than 5 min as a miss
+        const CACHE_TTL_MS = 5 * 60 * 1000
+        try {
+            const raw = localStorage.getItem("projects")
+            if (raw) {
+                const parsed = JSON.parse(raw) as { data: typeof projectList; cachedAt: number }
+                const isStale = Date.now() - (parsed.cachedAt ?? 0) > CACHE_TTL_MS
+                if (!isStale && Array.isArray(parsed.data)) {
+                    setProjectList(parsed.data)
+                    // Background refresh without showing spinner
+                    // eslint-disable-next-line react-hooks/immutability
+                    getProjectList(false)
+                    return
+                }
+            }
+        } catch {
+            localStorage.removeItem("projects")
         }
         // eslint-disable-next-line react-hooks/immutability
-        else { getProjectList(true) }
+        getProjectList(true)
     }, [])
 
     const getProjectList = async (showLoader = true) => {
@@ -56,7 +68,8 @@ export function AppSidebar() {
 
             const result = await axios.get("/api/project_list")
             setProjectList(result.data)
-            localStorage.setItem("projects", JSON.stringify(result.data))
+            // Persist with timestamp so TTL check works on next load
+            localStorage.setItem("projects", JSON.stringify({ data: result.data, cachedAt: Date.now() }))
         } catch (error) {
             console.error(error)
         } finally {
