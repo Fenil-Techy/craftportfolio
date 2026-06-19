@@ -293,6 +293,13 @@ Maintain excellent contrast.
 
 Use high-quality Unsplash images.
 
+Always append these URL parameters to every Unsplash URL:
+?w=800&q=80&auto=format&fit=crop
+
+Example: https://images.unsplash.com/photo-xxxxx?w=800&q=80&auto=format&fit=crop
+
+This keeps image weight under 100KB per image instead of several MB.
+
 Always:
 
 * object-cover
@@ -511,7 +518,8 @@ function Playground() {
 
 
             if (mode === "code") {
-              if (cleanedText.length - lastLengthRef.current > 500) {
+              // 3.6 — Only update iframe every 2000 chars to reduce re-paints (~6 updates vs ~24)
+              if (cleanedText.length - lastLengthRef.current > 2000) {
                 lastLengthRef.current = cleanedText.length;
                 setGeneratedCode(cleanedText);
               }
