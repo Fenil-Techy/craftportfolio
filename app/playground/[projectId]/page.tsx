@@ -9,7 +9,7 @@ import WebsiteDesign from '../_components/WebsiteDesign'
 import { useParams, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { toast } from 'sonner'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, X } from 'lucide-react'
 import { Loader } from '@/components/ui/loader'
 
 export type Messages = {
@@ -564,12 +564,13 @@ function Playground() {
       }
     } catch (error) {
       console.error("Error:", error);
-
+      // 4.12 — Surface the failure visually with a toast, not just a chat message
+      toast.error("Generation failed. Please try again.");
       setMessages((prev: any) => [
         ...(prev || []),
         {
           role: "assistant",
-          content: "Something went wrong",
+          content: "Something went wrong. Please try again.",
         },
       ]);
     }
@@ -630,25 +631,31 @@ function Playground() {
             <>
               {/* Backdrop */}
               <div
-                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-                onClick={() => setChatOpen(false)} // optional: close on outside click
+                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+                onClick={() => setChatOpen(false)}
               />
 
-              {/* Chat Widget */}
-              <div className="
-fixed bottom-6 right-4 z-50
-flex h-[80dvh] w-[92vw] max-w-md flex-col
-overflow-hidden rounded-3xl
-border border-white/10
-bg-zinc-900/95
-backdrop-blur-xl
-shadow-[0_20px_80px_rgba(0,0,0,0.45)]
-">
+              {/* 4.5 — Chat Widget with slide-up animation */}
+              <div
+                className="
+                  fixed bottom-6 right-4 z-50
+                  flex h-[80dvh] w-[92vw] max-w-md flex-col
+                  overflow-hidden rounded-3xl
+                  border border-white/10
+                  bg-zinc-900/95
+                  backdrop-blur-xl
+                  shadow-[0_20px_80px_rgba(0,0,0,0.45)]
+                  animate-in slide-in-from-bottom-6 fade-in duration-300
+                "
+              >
                 <div className="flex shrink-0 items-center justify-between border-b p-3">
-                  <h2 className="font-semibold">Chat Section</h2>
-
-                  <button onClick={() => setChatOpen(false)}>
-                    ✕
+                  <h2 className="font-semibold">Chat</h2>
+                  <button
+                    onClick={() => setChatOpen(false)}
+                    aria-label="Close chat"
+                    className="rounded-full p-1 hover:bg-zinc-700 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
 
@@ -658,7 +665,6 @@ shadow-[0_20px_80px_rgba(0,0,0,0.45)]
                     onSend={(input: string) => SendMessage(input)}
                     loading={loading}
                   />
-                  
                 </div>
               </div>
             </>
@@ -666,12 +672,31 @@ shadow-[0_20px_80px_rgba(0,0,0,0.45)]
         </div>
         <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
           <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize} />
-            {initialLoading && (
-              <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                <Loader />
+
+          {/* Initial DB fetch overlay */}
+          {initialLoading && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              <Loader />
+            </div>
+          )}
+
+          {/* 4.3 — Generating overlay: shown when AI is streaming and no code exists yet */}
+          {loading && !generatedCode && (
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-zinc-950/90 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3">
+                <Loader size={48} />
+                <p className="text-lg font-semibold text-white">Generating your portfolio…</p>
+                <p className="text-sm text-zinc-400">This usually takes 20–40 seconds</p>
               </div>
-            )}
-          
+              {/* Pulsing skeleton preview */}
+              <div className="w-full max-w-sm space-y-3 px-4">
+                <div className="h-4 w-3/4 animate-pulse rounded-full bg-zinc-700" />
+                <div className="h-4 w-full animate-pulse rounded-full bg-zinc-700" />
+                <div className="h-4 w-5/6 animate-pulse rounded-full bg-zinc-700" />
+                <div className="h-4 w-2/3 animate-pulse rounded-full bg-zinc-700" />
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

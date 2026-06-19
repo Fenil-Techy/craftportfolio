@@ -159,11 +159,28 @@ function Hero() {
       {/* Input box */}
       <div className="w-full max-w-2xl border mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-black mx-auto">
         <textarea
-          placeholder="Describe how your dream website should looks like"
+          placeholder="Describe how your dream website should look like"
           className="min-h-20 sm:min-h-24 w-full focus:outline-none focus:ring-0 resize-none text-white text-sm sm:text-base"
-          onChange={(e) => setUserInput(e.target.value)}
+          onChange={(e) => {
+            // 4.9 — Enforce max 2000 chars
+            if (e.target.value.length <= 2000) {
+              setUserInput(e.target.value)
+            }
+          }}
           value={userInput}
+          maxLength={2000}
         />
+        {/* 4.9 — Character counter */}
+        <div className="flex justify-between items-center gap-2 mt-1 mb-1">
+          <span className={`text-xs tabular-nums ${
+            (userInput?.length ?? 0) >= 1800 ? 'text-red-400' : 'text-zinc-500'
+          }`}>
+            {userInput?.length ?? 0}/2000
+          </span>
+          {userInput && (userInput.trim().length < 10) && (
+            <span className="text-xs text-amber-400">Please add a few more details (min 10 characters)</span>
+          )}
+        </div>
         <div className="flex justify-between items-center gap-2 mt-2">
           {/* Model Selector */}
           <Select
@@ -213,8 +230,8 @@ function Hero() {
           </Select>
           {!user ? (
             <SignInButton mode="modal" forceRedirectUrl="/workspace">
-              <Button 
-                disabled={!userInput} 
+              <Button
+                disabled={!userInput || (userInput?.trim().length ?? 0) < 10}
                 className="shrink-0"
                 aria-label="Sign in to generate project"
               >
@@ -222,9 +239,9 @@ function Hero() {
               </Button>
             </SignInButton>
           ) : (
-            <Button 
-              disabled={!userInput || loading} 
-              onClick={CreateNewProject} 
+            <Button
+              disabled={!userInput || loading || (userInput?.trim().length ?? 0) < 10}
+              onClick={CreateNewProject}
               className="shrink-0"
               aria-label="Generate AI Project"
             >

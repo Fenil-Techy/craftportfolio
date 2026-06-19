@@ -22,6 +22,8 @@ import { Loader2Icon, MessageCircle, Square, SquarePen } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useContext, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { MAX_FREE_CREDITS } from "@/config/credits"
 
 
 
@@ -30,6 +32,7 @@ export function AppSidebar() {
     const [loading, setLoading] = useState(false)
     const { open } = useSidebar()
     const context = useContext(UserDetailContext)
+    const router = useRouter()
 
     if (!context) {
         throw new Error("UserDetailContext not provided")
@@ -125,10 +128,15 @@ export function AppSidebar() {
                 </>
                 :
                 <SidebarGroup>
-                    <div className="flex flex-col items-center justify-center ">
-                        <button className="hover:bg-black rounded-full text-gray-300 p-3 hover:text-white"><SquarePen/></button>                        
-                        <button className="hover:bg-black rounded-full text-gray-300 p-3 hover:text-white"><MessageCircle/></button>                        
-
+                    <div className="flex flex-col items-center justify-center gap-1">
+                        {/* 4.4 — Wire collapsed icons to navigation */}
+                        <button
+                            title="New Project"
+                            onClick={() => router.push('/workspace')}
+                            className="hover:bg-black rounded-full text-gray-300 p-3 hover:text-white"
+                        >
+                            <SquarePen />
+                        </button>
                     </div>
                 </SidebarGroup>
             }
@@ -140,7 +148,8 @@ export function AppSidebar() {
                     <>
                 {!hasUnlimitedAcess && <div className="p-3 space-y-3 bg-secondary border rounded-2xl">
                     <h2 className="font-bold">Remaining Credits : <span>{!userDetail ? <Loader2Icon className="animate-spin" /> : userDetail.credits}</span></h2>
-                    <Progress value={userDetail ? (userDetail?.credits / 2) * 100 : null} />
+                    {/* 4.7 — Use MAX_FREE_CREDITS constant instead of hardcoded 2 */}
+                    <Progress value={userDetail ? (userDetail?.credits / MAX_FREE_CREDITS) * 100 : null} />
                     <Link href={"/pricing"} className="w-full">
                         <Button className="w-full p-5 bg-black text-white">Upgrade to Unlimited</Button>
                     </Link>
