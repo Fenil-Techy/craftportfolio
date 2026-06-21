@@ -80,7 +80,7 @@
 - [x] 5.3 · Add Context Window Management (Message Summarization)
 - [x] 5.4 · Add Stream Timeout
 - [x] 5.8 · Multi-Model Fallback Chain
-- ~~5.5~~ deferred
+- [x] 5.5 · Add "Enhance Prompt" Feature
 - ~~5.6~~ deferred
 - ~~5.7~~ deferred
 - ~~5.9~~ deferred
