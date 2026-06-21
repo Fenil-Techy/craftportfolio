@@ -4,7 +4,8 @@ export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
-  credits: integer().notNull().default(2)
+  credits: integer().notNull().default(2),
+  clerkId: varchar({ length: 255 }).unique()
 });
 
 export const projectTable = pgTable("projects", {
@@ -12,7 +13,7 @@ export const projectTable = pgTable("projects", {
 
   projectId: varchar().notNull().unique(),
 
-  createdBy: varchar().references(() => usersTable.email),
+  createdBy: integer().references(() => usersTable.id),
 
   selectedModel: varchar(),
 
@@ -44,7 +45,7 @@ export const chatTable = pgTable("chats", {
 
   chatMessage: json(),
 
-  createdBy: varchar().references(() => usersTable.email),
+  createdBy: integer().references(() => usersTable.id),
 
   createdOn: timestamp().defaultNow(),
 }, (t) => ({
