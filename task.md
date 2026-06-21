@@ -119,10 +119,10 @@
 
 > 🧊 Enterprise tasks (8.1 GDPR, 8.2 SOC2, 8.3 SSO, 8.4 White-label, 8.5 Audit logs, 8.10 Data residency) are FROZEN — do not start until app has paying users.
 
-- [ ] 8.6 · Admin dashboard — user list, credit adjustment, last 50 gen logs (gated to your Clerk ID)
-- [ ] 8.7 · Minimal test suite — unit tests for credit logic + Razorpay sig verification (Vitest)
-- [ ] 8.8 · CI/CD — GitHub Actions: lint + tsc + unit tests on every push
-- [ ] 8.9 · Uptime monitoring — BetterUptime or UptimeRobot free tier (no code needed)
+- [x] 8.6 · Admin dashboard — user list, credit adjustment, last 50 gen logs (gated to your Clerk ID)
+- [x] 8.7 · Minimal test suite — unit tests for credit logic + Razorpay sig verification (Vitest)
+- [x] 8.8 · CI/CD — GitHub Actions: lint + tsc + unit tests on every push
+- [x] 8.9 · Uptime monitoring — BetterUptime or UptimeRobot free tier (no code needed)
 
 
 
