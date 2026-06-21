@@ -1193,179 +1193,102 @@ Files: app/api/domains/route.ts (new), app/settings/domains/page.tsx (new)
 
 ---
 
-## Phase 8 — Enterprise Readiness
-### *Make it safe enough for companies to bet their brand on*
-**Target: 3–6 months post-launch, as revenue grows**
+## Phase 8 — Operational Essentials
+### *The minimum tooling needed to run a real product — even with 10 users*
+**Target: Ship these before or shortly after first paying user**
+
+> **Remapped 2026-06-21:** Zero users, zero revenue. Only tasks with immediate ROI are active.
+> Enterprise-only tasks (GDPR, SOC 2, SSO, white-label, audit logs, data residency) are frozen
+> in the **Deferred Until Growth** section below — do not work on them until explicitly re-enabled.
 
 ---
 
-### 8.1 · Add Full Audit Logging
-**Complexity:** 🟠 M — **Priority:** P0
-
-No audit trail exists. Who created what, when, with which model, using which credits — none of this is queryable.
-
-**Fix:** Create an `audit_logs` table:
-```sql
-audit_logs (
-  id, userId, action, resourceType, resourceId,
-  metadata jsonb, ipAddress, userAgent, createdAt
-)
-```
-Log: project creation, deletion, generation, export, billing events.
-
-```
-Files: config/schema.ts, lib/audit.ts (new)
-```
-
----
-
-### 8.2 · Implement GDPR Compliance
+### 8.6 · Build a Basic Admin Dashboard
 **Complexity:** 🔴 L — **Priority:** P0
 
-No privacy policy, no data deletion workflow, no cookie consent. Required for EU users.
+No internal tooling to debug issues or manually adjust credits. When a paying user has a problem, you're flying blind.
 
-**Fix:**
-1. Add Privacy Policy and Terms of Service pages.
-2. Build a "Delete My Account" flow that hard-deletes all user data (projects, frames, chats, logs).
-3. Add a data export feature (JSON download of all user data).
-4. Add cookie consent banner.
-
-```
-Files: app/privacy/page.tsx, app/terms/page.tsx (new), app/api/users/delete/route.ts (new)
-```
-
----
-
-### 8.3 · Add SOC 2 / ISO 27001 Readiness
-**Complexity:** 🔵 XL — **Priority:** P1
-
-Enterprise customers require compliance certifications before using SaaS tools with business data.
-
-**Fix:**
-1. Enable Neon's encryption at rest.
-2. Enable Neon point-in-time recovery (PITR) backups.
-3. Implement least-privilege DB roles (read-only user for analytics queries).
-4. Enable Vercel's security headers and WAF.
-5. Document data flows for auditors.
+**Scope (minimal — not a full analytics suite):**
+- Private `/admin` route gated to your own Clerk user ID
+- User list: email, plan, credits remaining, last active
+- Manual credit adjustment (add/remove credits for a user)
+- Last 50 generation logs (model, duration, error flag)
+- No charts needed yet — a plain table is fine
 
 ```
-Files: Infrastructure configuration + documentation
+Files: app/admin/page.tsx (new), app/admin/_components/ (new), app/api/admin/* (new)
 ```
 
 ---
 
-### 8.4 · Add White-Label / Embed Mode
-**Complexity:** 🔵 XL — **Priority:** P1
-
-Agencies want to offer portfolio generation to their own clients under their own brand.
-
-**Fix:**
-1. Add `organizations.customDomain`, `organizations.brandName`, `organizations.logoUrl`.
-2. The app reads org context and renders custom branding.
-3. Remove "CraftPortfolio" branding for white-label orgs.
-4. Provide an embed-mode `<iframe src="app.craftportfolio.com/embed?orgId=...">` widget.
-
-```
-Files: Org settings, layout system, theming (major feature)
-```
-
----
-
-### 8.5 · Add SSO (SAML / OIDC) via Clerk
+### 8.7 · Add a Minimal Test Suite
 **Complexity:** 🟠 M — **Priority:** P1
 
-Enterprise IT departments require SSO with their existing identity providers (Okta, Azure AD, Google Workspace).
+Zero tests. Credit deduction, auth guards, and Razorpay signature verification are the highest-risk paths.
 
-**Fix:** Clerk Enterprise supports SAML SSO natively. Enable it and add organization-level SSO configuration in the admin panel.
-
-```
-Requires: Clerk Enterprise plan
-Files: Admin settings UI
-```
-
----
-
-### 8.6 · Build an Admin Dashboard
-**Complexity:** 🔴 L — **Priority:** P1
-
-No internal tooling for support or monitoring. You cannot see user activity, debug failed generations, or manually adjust credits.
-
-**Fix:** Build a private `/admin` route (gated to specific Clerk user IDs or org roles) with:
-- User management (view, credit adjustment, suspension)
-- Generation logs (model usage, costs, error rates)
-- Revenue metrics (daily, monthly, by plan)
-- System health (DB connections, API error rates)
+**Scope (start small, not 70% coverage):**
+1. Unit tests for `lib/user-helper.ts` credit logic (Vitest)
+2. Unit test for Razorpay signature verification helper
+3. Integration smoke test: `POST /api/projects` returns 401 without auth
+4. Skip E2E (Playwright) until there are 3+ critical user flows to protect
 
 ```
-Files: app/admin/* (new, extensive)
+Install: vitest @testing-library/react
+Files: __tests__/lib/ (new), __tests__/api/ (new)
 ```
 
 ---
 
-### 8.7 · Add Comprehensive Test Suite
-**Complexity:** 🔴 L — **Priority:** P1
-
-Zero tests of any kind. API routes, credit logic, and AI pipeline have no regression coverage.
-
-**Fix:**
-1. Unit tests for `lib/` utilities (Vitest).
-2. Integration tests for API routes with mock DB (Vitest + @testing-library).
-3. Critical path E2E tests: sign-up → create project → generate → save (Playwright).
-4. Target 70%+ coverage on API routes.
-
-```
-Install: vitest @testing-library/react playwright
-Files: __tests__/ (new), .github/workflows/test.yml (new)
-```
-
----
-
-### 8.8 · Add CI/CD Pipeline
+### 8.8 · Add CI/CD Pipeline (Lint + Type-Check Only)
 **Complexity:** 🟡 S — **Priority:** P1
 
-No automated testing or deployment pipeline. Bugs are caught in production.
+A single broken `tsc` or ESLint error should not reach production. This is a 30-minute setup.
 
-**Fix:** Add GitHub Actions workflows:
-1. `on: pull_request`: Run lint + type check + unit tests.
-2. `on: push to main`: Run E2E tests + deploy to staging.
-3. `on: release tag`: Deploy to production.
-
-```
-Files: .github/workflows/ci.yml, .github/workflows/deploy.yml (new)
-```
-
----
-
-### 8.9 · Add SLA Monitoring and Uptime Page
-**Complexity:** 🟡 S — **Priority:** P2
-
-No public uptime page. Enterprise customers and PR reviews always check `status.yourproduct.com`.
-
-**Fix:** Add **BetterUptime** or **Instatus** monitoring with:
-- API endpoint health checks every 60 seconds
-- AI generation smoke test every 5 minutes
-- Public status page at `status.craftportfolio.online`
-- Slack/PagerDuty alerts on downtime
+**Scope (minimal — not full E2E in CI yet):**
+1. GitHub Actions on every `push` and `pull_request`:
+   - `npm run lint`
+   - `npx tsc --noEmit`
+   - `npm run test` (unit tests from 8.7)
+2. No deployment automation needed yet (Vercel already auto-deploys)
 
 ```
-Setup: Third-party service configuration
+Files: .github/workflows/ci.yml (new)
 ```
 
 ---
 
-### 8.10 · Add Data Residency Options
-**Complexity:** 🔵 XL — **Priority:** P2
+### 8.9 · Add Free Uptime Monitoring
+**Complexity:** 🟢 XS — **Priority:** P2
 
-Large enterprises (particularly in EU, healthcare, finance) require data to stay within specific geographic regions.
+Even with 1 user, you want to know when the site is down before they do.
 
-**Fix:**
-1. Create regional Neon database instances (EU, US, APAC).
-2. Route users to their regional DB based on signup location or org preference.
-3. Ensure OpenRouter API calls use EU-based models when required.
+**Scope:**
+- Sign up for **BetterUptime** (free tier) or **UptimeRobot** (free)
+- Monitor: `/` (homepage), `/api/users` (DB connectivity check), `/api/ai-model` (POST health)
+- Set email alert on downtime
+- Optional: public status page at `status.craftportfolio.online`
 
 ```
-Files: config/db.ts (multi-region), infrastructure configuration
+Setup: Third-party service only — no code changes needed
 ```
+
+---
+
+## 🧊 Phase 8 — Deferred Until Growth
+### *Do NOT work on these until app has paying users or explicit need*
+
+These tasks are frozen. They require significant effort but have near-zero ROI until the product has traction.
+
+| # | Task | Reason to Defer |
+|---|---|---|
+| 8.1 | Full Audit Logging | No compliance need, no enterprise customers |
+| 8.2 | GDPR Compliance | Matters at EU user volume; ship Privacy Policy page manually for now |
+| 8.3 | SOC 2 / ISO 27001 | Enterprise sales prerequisite — years away |
+| 8.4 | White-Label / Embed Mode | Needs paying org customers first |
+| 8.5 | SSO (SAML / OIDC) | Enterprise IT requirement — not relevant pre-revenue |
+| 8.10 | Data Residency Options | Regional infrastructure problem — not relevant at current scale |
+
+> To re-activate any of these, move them back into the active Phase 8 section above.
 
 ---
 

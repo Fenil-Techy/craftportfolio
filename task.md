@@ -101,5 +101,29 @@
 - [x] 6.10 · Add A/B Testing Infrastructure (Installed `posthog-js` and integrated identify checks)
 - ~~6.5~~ deferred/unnecessary (Visual editor relies on SSE streaming, client timeout increased to 5min)
 
+---
+
+## Phase 7 — Monetization ✅
+
+- [x] 7.1 · Credit System tiers setup in config/credits.ts, config/schema.ts, types/user.ts, lib/user-helper.ts
+- [x] 7.2 · Migrate billing from Stripe to Razorpay (order/verify endpoints, pricing script integration)
+- [x] 7.3 · Pro badge, model gating (Qwen 3 235B) in model config, Hero selector, sidebar UI, and backend AI model route
+- [x] 7.5 · Attribution watermark in system prompt and client-side HTML injections (Iframe preview, download/view code)
+- [x] Install razorpay npm package
+- [x] Code type check and verification (npx tsc --noEmit)
+- [ ] 7.4 · Referral system (bonus credits for referrer on signup) — deferred
+
+---
+
+## Phase 8 — Operational Essentials
+
+> 🧊 Enterprise tasks (8.1 GDPR, 8.2 SOC2, 8.3 SSO, 8.4 White-label, 8.5 Audit logs, 8.10 Data residency) are FROZEN — do not start until app has paying users.
+
+- [ ] 8.6 · Admin dashboard — user list, credit adjustment, last 50 gen logs (gated to your Clerk ID)
+- [ ] 8.7 · Minimal test suite — unit tests for credit logic + Razorpay sig verification (Vitest)
+- [ ] 8.8 · CI/CD — GitHub Actions: lint + tsc + unit tests on every push
+- [ ] 8.9 · Uptime monitoring — BetterUptime or UptimeRobot free tier (no code needed)
+
+
 
 
