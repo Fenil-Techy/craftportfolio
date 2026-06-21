@@ -15,6 +15,8 @@ export const projectTable = pgTable("projects", {
 
   projectId: varchar().notNull().unique(),
 
+  title: varchar({ length: 255 }).default('Untitled Project'),
+
   createdBy: integer().references(() => usersTable.id),
 
   selectedModel: varchar(),

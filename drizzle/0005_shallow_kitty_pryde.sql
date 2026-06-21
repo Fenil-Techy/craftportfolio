@@ -1,0 +1,1 @@
+ALTER TABLE "projects" ADD COLUMN "title" varchar(255) DEFAULT 'Untitled Project';

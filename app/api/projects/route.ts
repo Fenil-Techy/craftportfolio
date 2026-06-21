@@ -82,9 +82,42 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 4.10 Generate Title
+    let title = "Untitled Project";
+    if (messages[0]?.content) {
+      try {
+        const titleResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: "Summarize this request in 3 to 5 words for a project title. Return ONLY the title without quotes, markdown, or punctuation." },
+              { role: "user", content: messages[0].content }
+            ],
+            stream: false,
+            max_tokens: 20
+          })
+        });
+        if (titleResponse.ok) {
+          const titleData = await titleResponse.json();
+          const generatedTitle = titleData.choices?.[0]?.message?.content?.trim();
+          if (generatedTitle) {
+            title = generatedTitle;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to generate project title", e);
+      }
+    }
+
     // 5. Execute core records instantiation safely since credits are verified
     await db.insert(projectTable).values({
       projectId,
+      title,
       createdBy: dbUser.id,
       selectedModel: model,
     });
@@ -115,6 +148,7 @@ export async function POST(req: NextRequest) {
     // Return clean response back to client
     return NextResponse.json({
       projectId,
+      title,
       frameId,
       messages,
       model,

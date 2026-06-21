@@ -118,7 +118,7 @@ export function AppSidebar() {
                                         <Link key={project.projectId} href={`/playground/${project.projectId}?frameId=${project.frameId}`}>
                                             <div className=" p-2 hover:rounded-2xl hover:bg-black hover:text-white text-gray-300 ">
                                                 <h2 className="line-clamp-2">
-                                                    {project?.chats?.[0]?.chatMessage?.[0]?.content || "Untitled Project"}
+                                                    {project?.title || project?.chats?.[0]?.chatMessage?.[0]?.content || "Untitled Project"}
                                                 </h2>
                                             </div>
                                         </Link>

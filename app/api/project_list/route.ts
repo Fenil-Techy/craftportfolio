@@ -8,6 +8,7 @@ import { getOrCreateUser } from "@/lib/user-helper";
 
 type ProjectListEntry = {
   projectId: string;
+  title: string | null;
   frameId: string;
   chats: {
     id: number;
@@ -128,6 +129,7 @@ export async function GET(req: NextRequest) {
     for (const frameId of frameIds) {
       results.push({
         projectId: project.projectId,
+        title: project.title,
         frameId,
         chats: chatsByFrame.get(frameId) ?? [],
       });
