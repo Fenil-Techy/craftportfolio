@@ -35,12 +35,22 @@ function Hero() {
 
   const { userDetail, setUserDetail } = context
   const { has } = useAuth()
-  const hasUnlimitedAcess = has({ plan: 'pro' })
+  const hasUnlimitedAcess = has ? has({ plan: 'pro' }) : false
+  const isPro = hasUnlimitedAcess || userDetail?.tier === 'pro';
 
   const CreateNewProject = async () => {
+    // Model Gating Check
+    const modelConfig = AI_MODELS.find(m => m.id === selectedModel);
+    if (modelConfig?.premium && !isPro) {
+      toast.error(`${modelConfig.name} is a Pro feature. Please upgrade to Pro to use it!`);
+      router.push("/pricing");
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    if (!hasUnlimitedAcess && userDetail?.credits! <= 0) {
-      toast.error("You have no credits left. Please upgrade to unlimited")
+    if (!isPro && userDetail?.credits! <= 0) {
+      toast.error("You have no credits left. Please upgrade to Pro or purchase a credit pack.")
+      router.push("/pricing");
       return;
     }
 
@@ -63,7 +73,7 @@ function Hero() {
       })
 
       toast.success('Project created')
-      if (!hasUnlimitedAcess && userDetail) {
+      if (!isPro && userDetail) {
         setUserDetail({
           ...userDetail,
           credits: userDetail.credits - 1
@@ -208,21 +218,28 @@ function Hero() {
               <SelectValue placeholder="Select AI Model" />
             </SelectTrigger>
 
-            <SelectContent className="rounded-xl bg-zinc-900 border border-white/10">
+            <SelectContent className="rounded-xl bg-zinc-900 border border-white/10 text-white">
               {AI_MODELS.map((model) => (
                 <SelectItem
                   key={model.id}
                   value={model.id}
                   className="cursor-pointer py-2 rounded-lg data-highlighted:bg-blue-500/20"
                 >
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={model.logo}
-                      alt={`${model.name} logo`}
-                      width={20}
-                      height={20}
-                    />
-                    <span>{model.name}</span>
+                  <div className="flex items-center justify-between w-full min-w-[180px]">
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={model.logo}
+                        alt={`${model.name} logo`}
+                        width={20}
+                        height={20}
+                      />
+                      <span>{model.name}</span>
+                    </div>
+                    {model.premium && (
+                      <span className="ml-2 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 px-2 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider shrink-0">
+                        Pro
+                      </span>
+                    )}
                   </div>
                 </SelectItem>
               ))}
