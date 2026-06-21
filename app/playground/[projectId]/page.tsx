@@ -85,7 +85,7 @@ function Playground() {
     })
 
     return () => {
-      abortControllerRef.current?.abort();
+      // Intentionally not aborting to prevent React StrictMode double-mount race conditions
     };
   }, [frameId, projectId])
 
@@ -105,16 +105,14 @@ function Playground() {
     ]);
     const model = modelToUse ?? selectedModel;
 
-    // 5.2 — Cancel any in-flight requests before making a new one
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
+    // 5.2 — We use a local AbortController to avoid ref mutation issues
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
 
-    // 5.4 — Abort request after 90 seconds timeout
+    // 5.4 — Abort request after 5 minutes
     const timeoutId = setTimeout(() => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        toast.error("Generation is taking too long. Please try again.");
-      }
+      abortController.abort();
+      toast.error("Generation is taking too long. Please try again.");
     }, 300000);
    
     try {
@@ -145,12 +143,17 @@ function Playground() {
       
       const res = await fetch("/api/ai-model", {
         method: "POST",
-        signal: abortControllerRef.current.signal,
+        signal: abortController.signal,
         body: JSON.stringify({
           model,
           messages: apiMessages,
         }),
       });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText);
+      }
       
 
       const reader = res.body?.getReader();
