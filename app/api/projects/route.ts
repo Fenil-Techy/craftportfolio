@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Evaluate Clerk tier status
     const { has } = await auth();
-    const hasUnlimitedAccess = has({ plan: "pro" });
+    const hasUnlimitedAccess = has({ plan: "pro" }) || dbUser.tier === "pro";
 
     // 4. Handle Credits check securely WITHOUT db.transaction
     if (!hasUnlimitedAccess) {

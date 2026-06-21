@@ -1,5 +1,6 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { AI_MODELS } from "@/config/models";
+import { isModelAllowed } from "@/config/features";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { NextRequest } from "next/server";
 import { getOrCreateUser } from "@/lib/user-helper";
@@ -36,6 +37,16 @@ export async function POST(req: NextRequest) {
       return new Response(
         JSON.stringify({ error: "Invalid or unsupported model." }),
         { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Gated model authorization check
+    const { has } = await auth();
+    const isPro = has({ plan: "pro" }) || dbUser.tier === "pro";
+    if (!isModelAllowed(dbUser.tier, model) && !isPro) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: Upgrade to Pro to use premium models." }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
       );
     }
 
