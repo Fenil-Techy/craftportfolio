@@ -70,3 +70,35 @@
 - [x] 4.14 · Copy to clipboard button on assistant messages (hover reveal)
 - ~~4.10~~ deferred (needs DB schema migration)
 - ~~4.13~~ deferred (L complexity, belongs to Phase 5)
+
+---
+
+## Phase 5 — AI Improvements ✅
+
+- [x] 5.1 · Fix System Prompt Template and Make It Dynamic
+- [x] 5.2 · Add Abort Controller for SSE Stream
+- [x] 5.3 · Add Context Window Management (Message Summarization)
+- [x] 5.4 · Add Stream Timeout
+- [x] 5.8 · Multi-Model Fallback Chain
+- ~~5.5~~ deferred
+- ~~5.6~~ deferred
+- ~~5.7~~ deferred
+- ~~5.9~~ deferred
+- ~~5.10~~ deferred
+
+---
+
+## Phase 6 — Scaling Infrastructure (In Progress - Stopped)
+
+- [x] 6.1 · Add Drizzle DB Migration Workflow (programmatic migration scripts configured)
+- [x] 6.2 · Change `createdBy` FK from Email to User ID (completed database type migration + API routes updated)
+- [x] 6.4 · Add Connection Pooling with PgBouncer or Neon Pooled URL (DIRECT_DATABASE_URL configured)
+- ~~6.3~~ left for future (Normalize Chat Messages)
+- ~~6.5~~ left for future (Add Background Job Queue)
+- ~~6.6~~ left for future (Add Proper Error Monitoring)
+- ~~6.7~~ left for future (Add Usage Analytics)
+- ~~6.8~~ left for future (Implement Webhook-Based Credit Sync)
+- ~~6.9~~ left for future (Add CDN for Static Assets)
+- ~~6.10~~ left for future (Add A/B Testing Infrastructure)
+
+
