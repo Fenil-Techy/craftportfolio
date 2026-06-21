@@ -11,6 +11,8 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { Sparkles, X } from 'lucide-react'
 import { Loader } from '@/components/ui/loader'
+import { buildSystemPrompt } from '@/config/prompts'
+import { buildContextWindow } from '@/lib/context-manager'
 
 export type Messages = {
   role: string,
@@ -23,343 +25,10 @@ export type Frame = {
   chatMessages: Messages[]
 }
 
-const prompt = `
-You are an elite Portfolio Designer, Creative Director, and Senior Frontend Engineer.
-
-Your task is to create world-class personal portfolio websites that look handcrafted and premium which fits all screen mobile to desktop.
-
-The quality should rival portfolios featured on Awwwards, Framer, Vercel, Apple, Linear, and modern creative agencies.
-
-## INPUT
-
-User Request:
-
-{userInput}
-
----
-
-## TASK
-
-Determine whether the user is requesting:
-
-* A portfolio website
-* A normal conversation
-
-If it is NOT a portfolio website request, return:
-
-[[MODE:CHAT]]
-
-followed by ONLY the plain text response.
-
-Do NOT generate HTML.
-
----
-
-# PORTFOLIO MODE
-
-Return:
-
-[[MODE:CODE]]
-
-followed immediately by ONLY HTML body content.
-
-Never output:
-
-* Markdown
-* Explanations
-* Comments
-* Code fences
-* html/head/body tags
-* doctype
-
-Return only valid HTML body content.
-
----
-
-# TECHNOLOGY
-
-Use only:
-
-* HTML5
-* Tailwind CSS classes
-* Alpine.js only when interaction is needed
-* Lucide icons when appropriate
-
-Everything must work inside a single body.
-
----
-
-# DESIGN STYLE
-
-The portfolio should feel premium and modern.
-
-Inspired by:
-
-* Framer
-* Vercel
-* Stripe
-* Apple
-* Linear
-* Awwwards-winning portfolios
-
-Use:
-
-* Large typography
-* Minimalism
-* Elegant gradients
-* Glassmorphism where appropriate
-* Rounded cards
-* Soft shadows
-* Beautiful spacing
-* Visual hierarchy
-* Premium buttons
-* Smooth hover animations
-* Clean grids
-* Subtle motion
-
-Avoid:
-
-* Generic AI layouts
-* Bootstrap appearance
-* Repetitive sections
-* Lorem ipsum
-* Placeholder content
-* Empty whitespace
-* Poor spacing
-* Boring layouts
-
----
-# PERSONAL PORTFOLIO RULES
-
-This website is ALWAYS for a SINGLE PERSON.
-
-Never generate:
-
-- Startup landing pages
-- SaaS websites
-- Company websites
-- Agency websites
-- Product websites
-
-The portfolio owner should be treated as an individual professional.
-
-Generate realistic:
-
-- Full Name
-- Professional Title
-- Professional Profile Image (Unsplash)
-- Short Biography
-- Skills
-- Education
-- Experience
-- Featured Projects
-- Contact Information
-- Social Links
-
-The hero section MUST introduce the person.
-
-Example:
-
-John Carter
-AI & Machine Learning Student
-Building intelligent systems with Python, TensorFlow and Computer Vision.
-
-Include a professional portrait image.
-
-The website should immediately feel like a personal portfolio, not a business website.
-# PORTFOLIO STRUCTURE
-
-Choose sections dynamically depending on the user's profession.
-
-Possible sections:
-
-* Navbar
-* Hero
-* About
-* Services
-* Skills
-* Experience
-* Timeline
-* Projects
-* Tech Stack
-* Testimonials
-* Contact
-* Footer
-
-Include only relevant sections.
-
-Never generate unnecessary sections.
-
----
-
-# HERO SECTION
-
-Create a strong first impression with:
-
-* Large headline
-* Professional subtitle
-* CTA buttons
-* Social links
-* Hero image or illustration
-* Background effects
-
-The hero should feel memorable.
-
----
-
-# PROJECTS
-
-Projects should look premium.
-
-Include:
-
-* Large thumbnails
-* Category
-* Description
-* Technologies
-* Live Demo button
-* GitHub button
-* Hover animations
-
-Cards should feel interactive.
-
----
-
-# TYPOGRAPHY
-
-Hero:
-
-text-6xl md:text-7xl
-
-font-black
-
-tracking-tight
-
-Section Titles:
-
-text-4xl
-
-font-bold
-
-Body:
-
-text-lg
-
-leading-8
-
-Buttons:
-
-rounded-full
-
-font-semibold
-
-px-8 py-3
-
----
-
-# CARDS
-
-Use:
-
-rounded-2xl
-
-border
-
-shadow-xl
-
-backdrop-blur
-
-transition-all duration-300
-
-hover:scale-[1.02]
-
-hover:shadow-2xl
-
----
-
-# COLORS
-
-Automatically choose a premium palette.
-
-Dark mode preferred unless user specifies otherwise.
-
-Use tasteful gradients and accent colors.
-
-Maintain excellent contrast.
-
----
-
-# IMAGES
-
-Use high-quality Unsplash images.
-
-Always append these URL parameters to every Unsplash URL:
-?w=800&q=80&auto=format&fit=crop
-
-Example: https://images.unsplash.com/photo-xxxxx?w=800&q=80&auto=format&fit=crop
-
-This keeps image weight under 100KB per image instead of several MB.
-
-Always:
-
-* object-cover
-* rounded-2xl
-
-Provide meaningful alt text.
-
----
-
-# RESPONSIVENESS
-
-Must be mobile-first with responsive header.
-
-Responsive across all breakpoints.
-
-No horizontal overflow.
-
----
-
-# CONTENT
-
-Generate realistic content.
-
-Professional biography.
-
-Meaningful project descriptions.
-
-Realistic experience.
-
-Authentic testimonials.
-
-Strong CTAs.
-
-Never use lorem ipsum.
-
----
-
-# OUTPUT QUALITY
-
-The final result should look like a $20k–$50k professionally designed portfolio.
-
-Every section should feel intentional.
-
-Maintain spacing consistency.
-
-Maintain visual consistency.
-
-Avoid repetitive patterns.
-
-Generate COMPLETE HTML.
-
-Never stop midway.
-
-Always finish with the final closing tag.
-
-
-`
 function Playground() {
  
   const lastLengthRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const { projectId } = useParams()
   const params = useSearchParams()
@@ -371,6 +40,7 @@ function Playground() {
   const [selectedModel, setSelectedModel] = useState("google/gemma-4-26b-a4b-it");
   const [messages, setMessages] = useState<Messages[]>()
   const [initialLoading, setInitialLoading] = useState(true);
+
   useEffect(() => {
     if (!frameId) return
     setInitialLoading(true);
@@ -406,6 +76,10 @@ function Playground() {
      
       setInitialLoading(false)
     })
+
+    return () => {
+      abortControllerRef.current?.abort();
+    };
   }, [frameId, projectId])
 
   const SendMessage = async (
@@ -424,48 +98,53 @@ function Playground() {
     ]);
     const model = modelToUse ?? selectedModel;
 
+    // 5.2 — Cancel any in-flight requests before making a new one
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+
+    // 5.4 — Abort request after 90 seconds timeout
+    const timeoutId = setTimeout(() => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        toast.error("Generation is taking too long. Please try again.");
+      }
+    }, 90000);
    
     try {
-      // const chatHistory = [
-      //   ...(messages ?? []),
-      //   {
-      //     role: "user",
-      //     content: userInput,
-      //   },
-      // ];
+      const currentHistory = [
+        ...(messages ?? []),
+        userMessage,
+      ];
+
+      // 5.3 — Dynamic Context Window: Keep last 6 and summarize older messages
+      const { recentMessages, summaryMessage } = await buildContextWindow(currentHistory, 6);
+
+      const apiMessages = [
+        {
+          role: "system",
+          content: buildSystemPrompt(userInput),
+        },
+        ...(summaryMessage ? [summaryMessage] : []),
+        ...(generatedCode
+          ? [
+              {
+                role: "assistant",
+                content: generatedCode,
+              },
+            ]
+          : []),
+        ...recentMessages,
+      ];
       
       const res = await fetch("/api/ai-model", {
         method: "POST",
+        signal: abortControllerRef.current.signal,
         body: JSON.stringify({
           model,
-          messages: [
-            {
-              role: "system",
-              content: prompt.replace("{userInput}", userInput),
-            },
-
-            ...(generatedCode
-              ? [
-                  {
-                    role: "assistant",
-                    content: generatedCode,
-                  },
-                ]
-              : []),
-
-            ...(messages ?? []),
-
-            {
-              role: "user",
-              content: userInput,
-            },
-          ],
+          messages: apiMessages,
         }),
       });
       
-
-      // ...
-
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -527,6 +206,9 @@ function Playground() {
           } catch { }
         }
       }
+
+      clearTimeout(timeoutId);
+
       if (mode === "code") {
         setGeneratedCode(fullText);
       }
@@ -562,7 +244,12 @@ function Playground() {
       if (mode === "code") {
         await SaveGeneratedCode(fullText);
       }
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === "AbortError") {
+        console.log("Request aborted.");
+        return;
+      }
       console.error("Error:", error);
       // 4.12 — Surface the failure visually with a toast, not just a chat message
       toast.error("Generation failed. Please try again.");
