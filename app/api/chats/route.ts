@@ -1,5 +1,5 @@
 import { db } from "@/config/db";
-import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { chatTable, frameTable, projectTable, messageTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
@@ -59,10 +59,34 @@ export async function PUT(req: NextRequest) {
   }
 
   // Safe to update
-  await db
-    .update(chatTable)
-    .set({ chatMessage: messages })
-    .where(eq(chatTable.frameId, frameId));
+  // Find the chatId
+  const chatRecord = await db
+    .select({ id: chatTable.id })
+    .from(chatTable)
+    .where(eq(chatTable.frameId, frameId))
+    .limit(1);
+
+  if (chatRecord.length === 0) {
+    return NextResponse.json({ error: "Chat not found" }, { status: 404 });
+  }
+
+  const chatId = chatRecord[0].id;
+
+  // Perform atomic delete and insert in a transaction
+  await db.transaction(async (tx) => {
+    await tx.delete(messageTable).where(eq(messageTable.chatId, chatId));
+
+    if (messages.length > 0) {
+      await tx.insert(messageTable).values(
+        messages.map((m: any, idx: number) => ({
+          chatId,
+          role: m.role,
+          content: m.content,
+          sequenceNumber: idx + 1,
+        }))
+      );
+    }
+  });
 
   return NextResponse.json({ result: "updated" });
 }

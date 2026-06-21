@@ -3,7 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 import { desc, eq, inArray } from "drizzle-orm";
-import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { chatTable, frameTable, projectTable, messageTable } from "@/config/schema";
 import { getOrCreateUser } from "@/lib/user-helper";
 
 type ProjectListEntry = {
@@ -57,12 +57,34 @@ export async function GET(req: NextRequest) {
     .filter((id): id is string => id !== null);
 
   // Query 3: All chats for all frames in one shot
-  let allChats: ProjectListEntry["chats"] = [];
+  let allChats: { id: number; frameId: string | null; createdBy: number | null; createdOn: Date | null }[] = [];
   if (allFrameIds.length > 0) {
     allChats = await db
-      .select()
+      .select({
+        id: chatTable.id,
+        frameId: chatTable.frameId,
+        createdBy: chatTable.createdBy,
+        createdOn: chatTable.createdOn,
+      })
       .from(chatTable)
       .where(inArray(chatTable.frameId, allFrameIds));
+  }
+
+  const allChatIds = allChats.map((c) => c.id);
+
+  // Query 4: All messages for these chats in one shot
+  let allMessages: { chatId: number | null; role: string; content: string; sequenceNumber: number }[] = [];
+  if (allChatIds.length > 0) {
+    allMessages = await db
+      .select({
+        chatId: messageTable.chatId,
+        role: messageTable.role,
+        content: messageTable.content,
+        sequenceNumber: messageTable.sequenceNumber,
+      })
+      .from(messageTable)
+      .where(inArray(messageTable.chatId, allChatIds))
+      .orderBy(messageTable.sequenceNumber);
   }
 
   // Reshape in JS — O(n) with Maps
@@ -74,11 +96,28 @@ export async function GET(req: NextRequest) {
     framesByProject.set(frame.projectId, existing);
   }
 
+  const messagesByChat = new Map<number, { role: string; content: string }[]>();
+  for (const msg of allMessages) {
+    if (msg.chatId === null) continue;
+    const existing = messagesByChat.get(msg.chatId) ?? [];
+    existing.push({ role: msg.role, content: msg.content });
+    messagesByChat.set(msg.chatId, existing);
+  }
+
   const chatsByFrame = new Map<string, ProjectListEntry["chats"]>();
   for (const chat of allChats) {
     if (!chat.frameId) continue;
     const existing = chatsByFrame.get(chat.frameId) ?? [];
-    existing.push(chat);
+    
+    // Group the messages under the chatMessage key
+    const chatMessage = messagesByChat.get(chat.id) ?? [];
+    existing.push({
+      id: chat.id,
+      frameId: chat.frameId,
+      chatMessage,
+      createdBy: chat.createdBy,
+      createdOn: chat.createdOn,
+    });
     chatsByFrame.set(chat.frameId, existing);
   }
 

@@ -1,5 +1,5 @@
 import { db } from "@/config/db";
-import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { chatTable, frameTable, projectTable, messageTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
@@ -56,13 +56,25 @@ export async function GET(req: NextRequest) {
 
 
     const chatResult = await db
-        .select()
+        .select({ id: chatTable.id })
         .from(chatTable)
         .where(eq(chatTable.frameId, frameId))
 
+    let chatMessages: { role: string; content: string }[] = [];
+    if (chatResult.length > 0) {
+        chatMessages = await db
+            .select({
+                role: messageTable.role,
+                content: messageTable.content
+            })
+            .from(messageTable)
+            .where(eq(messageTable.chatId, chatResult[0].id))
+            .orderBy(messageTable.sequenceNumber);
+    }
+
     const finalResult = {
         ...frameResult[0],
-        chatMessages: chatResult[0]?.chatMessage ?? [],
+        chatMessages,
         selectedModel: projectResult[0]?.selectedModel,
     }
 

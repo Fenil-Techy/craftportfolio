@@ -4,6 +4,7 @@ import {
   frameTable,
   projectTable,
   usersTable,
+  messageTable,
 } from "@/config/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { eq, and, gt, sql } from "drizzle-orm";
@@ -93,11 +94,23 @@ export async function POST(req: NextRequest) {
       frameId,
     });
 
-    await db.insert(chatTable).values({
-      chatMessage: messages,
+    const chatInsert = await db.insert(chatTable).values({
       frameId,
       createdBy: dbUser.id,
-    });
+    }).returning({ id: chatTable.id });
+
+    const chatId = chatInsert[0].id;
+
+    if (messages && messages.length > 0) {
+      await db.insert(messageTable).values(
+        messages.map((m: any, idx: number) => ({
+          chatId,
+          role: m.role,
+          content: m.content,
+          sequenceNumber: idx + 1,
+        }))
+      );
+    }
 
     // Return clean response back to client
     return NextResponse.json({
