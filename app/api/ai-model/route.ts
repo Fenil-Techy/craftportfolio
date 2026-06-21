@@ -2,10 +2,14 @@ import { currentUser } from "@clerk/nextjs/server";
 import { AI_MODELS } from "@/config/models";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { NextRequest } from "next/server";
+import { getOrCreateUser } from "@/lib/user-helper";
+import { db } from "@/config/db";
+import { generationLogsTable } from "@/config/schema";
 
 const ALLOWED_MODELS = new Set(AI_MODELS.map((m) => m.id));
 
 export async function POST(req: NextRequest) {
+  const startTime = Date.now();
   try {
     // 2.1 — Auth guard: every caller must have a valid Clerk session
     const user = await currentUser();
@@ -13,8 +17,16 @@ export async function POST(req: NextRequest) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    const dbUser = await getOrCreateUser(user);
+    if (!dbUser) {
+      return new Response(
+        JSON.stringify({ error: "User profile not found." }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // 2.4 — Rate limit: 10 AI generations per 60 seconds per user
-    const limited = await checkRateLimit(req, user.id, "aiGeneration");
+    const limited = await checkRateLimit(req, dbUser.email, "aiGeneration");
     if (limited) return limited;
 
     const { messages, model, stream } = await req.json();
@@ -46,8 +58,10 @@ export async function POST(req: NextRequest) {
 
     let response: Response | null = null;
     let lastError: any = null;
+    let usedModel = model;
 
     for (const currentModel of fallbackChain) {
+      usedModel = currentModel;
       try {
         console.log(`[AI_MODEL] Attempting generation with model: ${currentModel}`);
         response = await fetch(
@@ -97,6 +111,20 @@ export async function POST(req: NextRequest) {
     // Handle non-streaming response for utility endpoints (like summarization)
     if (stream === false) {
       const data = await response.json();
+      const durationMs = Date.now() - startTime;
+      const usage = data.usage;
+      try {
+        await db.insert(generationLogsTable).values({
+          userId: dbUser.id,
+          model: usedModel,
+          durationMs,
+          promptTokens: usage?.prompt_tokens,
+          completionTokens: usage?.completion_tokens,
+          mode: "chat",
+        });
+      } catch (logErr) {
+        console.error("[ANALYTICS_ERROR] Failed to log generation:", logErr);
+      }
       return new Response(JSON.stringify(data), {
         headers: {
           "Content-Type": "application/json",
@@ -109,12 +137,26 @@ export async function POST(req: NextRequest) {
 
     const readable = new ReadableStream({
       async start(controller) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          controller.enqueue(value);
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } finally {
+          controller.close();
+          const durationMs = Date.now() - startTime;
+          try {
+            await db.insert(generationLogsTable).values({
+              userId: dbUser.id,
+              model: usedModel,
+              durationMs,
+              mode: "stream",
+            });
+          } catch (logErr) {
+            console.error("[ANALYTICS_ERROR] Failed to log generation:", logErr);
+          }
         }
-        controller.close();
       },
     });
 
