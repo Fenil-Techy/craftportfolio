@@ -56,10 +56,31 @@ profession,
   */
   export function buildSystemPrompt(
   userInput: string,
-  profession?: string
-  ): string {
+  profession?: string,
+  isPro?: boolean
+): string {
   const meta = detectWebsiteMeta(userInput);
   const finalProfession = profession || meta.profession;
+
+  const watermarkDirective = !isPro
+    ? `
+---
+
+# WATERMARK / ATTRIBUTION
+You MUST include a small, clean, and elegant attribution banner at the very bottom of the page (in the footer or right after it):
+<div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
+  <a href="https://craftportfolio.online" target="_blank" class="inline-flex items-center gap-1.5 hover:text-zinc-200 transition-colors">
+    <span>Made with</span>
+    <span class="font-semibold text-blue-400">Craft</span><span class="font-semibold text-purple-400">Portfolio</span>
+  </a>
+</div>
+`
+    : `
+---
+
+# NO WATERMARK / ATTRIBUTION
+Do NOT output any watermark, branding, footer attribution, or links relating to "CraftPortfolio" or "Made with CraftPortfolio". The portfolio code should be fully white-labeled.
+`;
 
 return `You are an elite UX/UI Designer, Creative Director, and Senior Frontend Engineer.
 
@@ -273,5 +294,7 @@ Generate COMPLETE HTML.
 
 Never stop midway.
 
-Always finish with the final closing tag.`;
+Always finish with the final closing tag.
+
+${watermarkDirective}`;
 }

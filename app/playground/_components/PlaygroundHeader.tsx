@@ -51,7 +51,7 @@ const HTML_CODE = `<!DOCTYPE html>
 {code}
 
       </html>`
-function PlaygroundHeader({ screenSize, setScreenSize, code }: any) {
+function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
   const context = useContext(OnSaveContext)
   if (!context) throw new Error('OnSaveContext not provided')
   const { onSave, setOnSave } = context
@@ -65,11 +65,29 @@ function PlaygroundHeader({ screenSize, setScreenSize, code }: any) {
     }
   }, [onSave])
   const finalCode = useMemo(() => {
-    return (HTML_CODE.replace("{code}", code) || "")
+    let cleanCode = (HTML_CODE.replace("{code}", code) || "")
       .replaceAll("```html", "")
-      .replace("```", "")
+      .replaceAll("```", "")
       .replace("html", "");
-  }, [code]);
+
+    // Enforce watermark on Free tier if not already present
+    if (!isPro && !cleanCode.includes("CraftPortfolio")) {
+      const watermarkHtml = `
+  <!-- CraftPortfolio Watermark -->
+  <div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
+    <a href="https://craftportfolio.online" target="_blank" class="inline-flex items-center gap-1.5 hover:text-zinc-200 transition-colors">
+      <span>Made with</span>
+      <span class="font-semibold text-blue-400">Craft</span><span class="font-semibold text-purple-400">Portfolio</span>
+    </a>
+  </div>`;
+      if (cleanCode.includes("</body>")) {
+        cleanCode = cleanCode.replace("</body>", `${watermarkHtml}\n</body>`);
+      } else {
+        cleanCode += watermarkHtml;
+      }
+    }
+    return cleanCode;
+  }, [code, isPro]);
   const ViewInNewTab = () => {
     if (!finalCode) return
 

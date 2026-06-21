@@ -12,7 +12,8 @@ import { X } from 'lucide-react';
 
 type Props = {
     generatedCode: string,
-    screenSize: string
+    screenSize: string,
+    isPro: boolean
 }
 
 const HTML_CODE = `
@@ -44,7 +45,7 @@ const HTML_CODE = `
       </html>
     `
 
-function WebsiteDesign({ generatedCode ,screenSize }: Props) {
+function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
    
     
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
@@ -226,13 +227,24 @@ function WebsiteDesign({ generatedCode ,screenSize }: Props) {
         const root = doc.getElementById("root");
         if (root) {
             clearSelectedElement();
-            root.innerHTML =
-                generatedCode
+            let codeToRender = generatedCode
                     ?.replaceAll("```html", "")
                     .replaceAll("```", "")
                     .replace("html", "") ?? "";
+
+            if (!isPro && codeToRender && !codeToRender.includes("CraftPortfolio")) {
+              codeToRender += `
+  <!-- CraftPortfolio Watermark -->
+  <div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
+    <a href="https://craftportfolio.online" target="_blank" class="inline-flex items-center gap-1.5 hover:text-zinc-200 transition-colors">
+      <span>Made with</span>
+      <span class="font-semibold text-blue-400">Craft</span><span class="font-semibold text-purple-400">Portfolio</span>
+    </a>
+  </div>`;
+            }
+            root.innerHTML = codeToRender;
         }
-    }, [generatedCode, clearSelectedElement]);
+    }, [generatedCode, clearSelectedElement, isPro]);
 
     useEffect(()=>{
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react-hooks/immutability
