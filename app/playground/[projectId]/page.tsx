@@ -238,6 +238,7 @@ function Playground() {
       }
 
       // ✅ final message depends on type
+      const hasAssistantMessage = messages?.some((m) => m.role === "assistant");
       const updatedMessages = [
         ...(messages ?? []),
         {
@@ -248,7 +249,7 @@ function Playground() {
           role: "assistant",
           content:
             mode === "code"
-              ? "Website updated successfully"
+              ? (hasAssistantMessage ? "Website updated successfully" : "Website generated successfully")
               : fullText,
         },
       ];
@@ -420,6 +421,7 @@ function Playground() {
             screenSize={screenSize}
             tier={tier}
             liveEditorEnabled={liveEditorEnabled}
+            isGenerating={loading}
           />
 
           {/* Initial DB fetch overlay */}
