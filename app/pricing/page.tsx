@@ -179,7 +179,7 @@ function Pricing() {
       />
       <Header />
 
-      <main className="relative flex flex-col items-center w-full px-4 sm:px-6 py-16 sm:py-24 overflow-hidden">
+      <main className="relative flex flex-col items-center w-full px-4 sm:px-6 pt-28 pb-16 sm:pt-36 sm:pb-24 overflow-hidden">
         {/* Ambient glows — Saffron */}
         <div
           className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full -z-10"

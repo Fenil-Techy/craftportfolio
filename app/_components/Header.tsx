@@ -19,7 +19,7 @@ function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 w-full"
+      className="fixed top-0 left-0 right-0 z-50 w-full"
       style={{
         backgroundColor: 'rgb(10 10 12 / 60%)',
         backdropFilter: 'blur(16px)',
@@ -27,7 +27,7 @@ function Header() {
         borderBottom: '1px solid rgb(255 255 255 / 0.06)',
       }}
     >
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3.5 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-3.5 lg:px-8">
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="CraftPortfolio home">
@@ -37,6 +37,7 @@ function Header() {
           </span>
         </Link>
 
+        <div className='flex justify-end'>
         {/* Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-1">
           {menu.map((item) => (
@@ -129,6 +130,7 @@ function Header() {
               </SignUpButton>
             </div>
           )}
+          </div>
 
           {/* Mobile menu toggle */}
           <button

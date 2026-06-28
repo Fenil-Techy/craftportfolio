@@ -5,19 +5,19 @@ import { ArrowRight } from 'lucide-react'
 
 function CTA() {
   return (
-    <section className="w-full py-16 bg-zinc-950/20" style={{ borderTop: '1px solid var(--color-border-base)' }}>
+    <section className="w-full py-16 bg-transparent">
       <div className="mx-auto max-w-5xl px-6">
         
         {/* Glowing Gradient Banner Container */}
         <div 
           className="w-full rounded-3xl p-8 sm:p-12 text-center flex flex-col items-center justify-center gap-6 relative overflow-hidden border border-white/5 shadow-2xl"
           style={{
-            background: 'linear-gradient(135deg, rgb(88 28 135 / 75%) 0%, rgb(49 46 129 / 75%) 50%, rgb(20 20 23 / 90%) 100%)',
+            background: 'linear-gradient(135deg, rgb(251 191 36 / 15%) 0%, rgb(217 119 6 / 6%) 50%, rgb(20 20 23 / 95%) 100%)',
           }}
         >
           {/* Inner ambient glows */}
-          <div className="absolute top-0 left-1/4 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/4 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-yellow-600/5 blur-3xl pointer-events-none" />
 
           {/* Heading */}
           <h2 
@@ -31,10 +31,23 @@ function CTA() {
           <div className="z-10 mt-2">
             <Link href="/workspace">
               <button 
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold bg-white text-zinc-950 hover:bg-zinc-100 transition-all duration-100 shadow-xl shadow-black/20"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-100 shadow-xl"
+                style={{
+                  backgroundColor: 'var(--color-brand)',
+                  color: 'var(--color-text-invert)',
+                  boxShadow: 'var(--shadow-brand)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-brand-hover)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 32px rgb(251 191 36 / 0.3)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-brand)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-brand)';
+                }}
               >
                 Start for free
-                <ArrowRight className="h-4 w-4 text-zinc-950" />
+                <ArrowRight className="h-4 w-4" />
               </button>
             </Link>
           </div>

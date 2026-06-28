@@ -25,7 +25,7 @@ function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
 
   return (
-    <section className="w-full py-20 bg-mesh relative" style={{ borderTop: '1px solid var(--color-border-base)' }}>
+    <section className="w-full py-20 bg-transparent relative">
       <div className="mx-auto max-w-3xl px-6 flex flex-col items-center gap-12">
         
         {/* Header */}

@@ -12,7 +12,7 @@ function Benefits() {
   ]
 
   return (
-    <section className="w-full py-20 bg-hostinger-glow relative" style={{ borderTop: '1px solid var(--color-border-base)' }}>
+    <section className="w-full py-20 bg-transparent relative">
       <div className="mx-auto max-w-5xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* Left Column: Outcome Copy */}
@@ -71,7 +71,7 @@ function Benefits() {
             style={{ backgroundColor: 'rgb(20 20 23 / 80%)', backdropFilter: 'blur(12px)' }}
           >
             {/* Background ambient glow inside frame */}
-            <div className="absolute -right-20 -bottom-20 w-44 h-44 rounded-full bg-purple-500/10 blur-2xl pointer-events-none" />
+            <div className="absolute -right-20 -bottom-20 w-44 h-44 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
 
             <div className="flex items-center justify-between pb-2.5 border-b border-white/5">
               <div className="flex items-center gap-1.5">

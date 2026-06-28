@@ -3,29 +3,10 @@ import React from 'react'
 import { Sparkles, Edit3, ArrowRight, Check } from 'lucide-react'
 
 function HowItWorks() {
-  const logos = ['Github', 'Vercel', 'Netlify', 'Cursor', 'Framer']
-
   return (
-    <section id="features" className="w-full py-20 bg-hostinger-glow relative flex flex-col gap-20" style={{ borderTop: '1px solid var(--color-border-base)' }}>
+    <section id="features" className="w-full py-20 bg-transparent relative">
       
-      {/* 1. Logo Wall */}
-      <div className="mx-auto max-w-5xl px-6 w-full flex flex-col items-center text-center gap-6">
-        <p className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">
-          Trusted by developers & design builders worldwide
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 md:gap-16 opacity-30 select-none">
-          {logos.map((logo) => (
-            <span
-              key={logo}
-              className="text-base sm:text-lg font-bold tracking-tight text-white font-sans"
-            >
-              {logo}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. Meet Section / Split Feature Layout */}
+      {/* Meet Section / Split Feature Layout */}
       <div className="mx-auto max-w-5xl px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* Left Column: Visual Mockup Container (Lovable style) */}

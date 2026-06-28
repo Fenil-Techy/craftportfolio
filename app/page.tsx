@@ -12,16 +12,15 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-lovable-mesh">
       <Header />
-      <main className="flex flex-1 flex-col">
-        <Hero />
-        <HowItWorks />
-        
-        <Benefits />
-        <Testimonials />
-        <FAQ />
-        <CTA />
-      </main>
-      <Footer />
+      <main className="flex flex-1 flex-col pt-16">
+          <Hero />
+          <HowItWorks />
+          <Benefits />
+          <Testimonials />
+          <FAQ />
+          <CTA />
+        </main>
+        <Footer />
     </div>
   );
 }

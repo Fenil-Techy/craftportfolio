@@ -134,22 +134,6 @@ function Hero() {
     <div
       className="relative flex flex-col items-center justify-center w-full min-h-[calc(100dvh-4rem)] lg:min-h-[82vh] px-4 sm:px-6 py-12 sm:py-16 text-center"
     >
-      {/* Ambient background glows — Saffron edition */}
-      <div
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[420px] w-[420px] sm:h-[600px] sm:w-[600px] rounded-full -z-10"
-        style={{
-          background: 'radial-gradient(ellipse, rgb(251 191 36 / 12%) 0%, transparent 70%)',
-          filter: 'blur(40px)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-24 -left-24 h-[280px] w-[280px] sm:h-[440px] sm:w-[440px] rounded-full -z-10"
-        style={{
-          background: 'radial-gradient(ellipse, rgb(251 191 36 / 5%) 0%, transparent 70%)',
-          filter: 'blur(60px)',
-        }}
-      />
-
       {/* Hero Headline */}
       <h1
         className="text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] max-w-4xl leading-[1.1] tracking-tight animate-fade-up"

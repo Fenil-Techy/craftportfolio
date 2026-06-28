@@ -255,17 +255,19 @@
 
   /* Lovable Neon Mesh Background */
   .bg-lovable-mesh {
-    background: radial-gradient(circle at 50% -20%, rgb(251 191 36 / 12%) 0%, transparent 50%),
-                radial-gradient(circle at 15% 80%, rgb(245 158 11 / 6%) 0%, transparent 45%),
-                radial-gradient(circle at 85% 55%, rgb(217 119 6 / 5%) 0%, transparent 40%),
-                var(--color-bg-base);
+    background-color: var(--onyx-950);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgb(251 191 36 / 10%) 0%, transparent 50%),
+      radial-gradient(circle at 100% 30%, rgb(245 158 11 / 6%) 0%, transparent 40%),
+      radial-gradient(circle at 0% 60%, rgb(217 119 6 / 5%) 0%, transparent 40%),
+      radial-gradient(circle at 70% 90%, rgb(251 191 36 / 5%) 0%, transparent 40%);
+    background-repeat: no-repeat;
     background-size: 100% 100%;
-    background-attachment: fixed;
   }
 
-  /* Hostinger Purple Glow Column */
+  /* Hostinger Brand Saffron Glow Column */
   .bg-hostinger-glow {
-    background: radial-gradient(circle at 50% 50%, rgb(147 51 234 / 15%), transparent 60%);
+    background: radial-gradient(circle at 50% 50%, rgb(251 191 36 / 10%), transparent 60%);
   }
 
   /* Premium Mockup glowing frame */

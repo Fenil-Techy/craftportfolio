@@ -22,7 +22,7 @@ function Testimonials() {
   ]
 
   return (
-    <section className="w-full py-20" style={{ borderTop: '1px solid var(--color-border-base)', backgroundColor: 'var(--color-bg-base)' }}>
+    <section className="w-full py-20 bg-transparent">
       <div className="mx-auto max-w-5xl px-6 flex flex-col items-center text-center gap-12">
         
         {/* Header */}
