@@ -2,9 +2,10 @@
 
 CraftPortfolio is a modern, high-performance web application designed to generate stunning, professional, and recruiter-ready personal portfolios in under 60 seconds from a single English prompt.
 
+Live URL: **[brocaption.vercel.app](https://brocaption.vercel.app)**
 ---
 
-## 🚀 Key Features
+##  Key Features
 
 * **AI-Driven Portfolio Generation**: Describe your background, education, projects, and skills in plain English. The AI automatically compiles a fully styled, multi-section portfolio.
 * **Interactive Live Editor Workspace**: Custom sidebar editor sheets allow users to update texts, toggle sections, adjust layout styles, and upload images.
@@ -15,7 +16,7 @@ CraftPortfolio is a modern, high-performance web application designed to generat
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 * **Frontend**: Next.js 16 (App Router, Turbopack), React, Tailwind CSS v4, Shadcn UI Components.
 * **Database & ORM**: PostgreSQL (Neon Serverless Database), Drizzle ORM.
@@ -26,7 +27,7 @@ CraftPortfolio is a modern, high-performance web application designed to generat
 
 ---
 
-## 📦 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -82,7 +83,7 @@ Open [http://localhost:3000](http://localhost:3000) in your web browser to view 
 
 ---
 
-## 🧪 Commands Reference
+##  Commands Reference
 
 * **Start Development**: `npm run dev`
 * **Production Build**: `npm run build`
