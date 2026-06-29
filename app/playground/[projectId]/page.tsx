@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useContext } from 'react'
 import PlaygroundHeader from '../_components/PlaygroundHeader'
 import ChatSection from '../_components/ChatSection'
 import WebsiteDesign from '../_components/WebsiteDesign'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Sparkles, X } from 'lucide-react'
@@ -28,6 +28,7 @@ export type Frame = {
 }
 
 function Playground() {
+  const router = useRouter();
   const context = useContext(UserDetailContext)
   const userDetail = context?.userDetail
   const { has } = useAuth()
@@ -67,11 +68,15 @@ function Playground() {
       if (hasStoredDesignCode) {
         const codeFence = "```html";
         const index = designCode.indexOf(codeFence);
-        const formattedCode =
+        let formattedCode =
           index >= 0
             ? designCode.slice(index + codeFence.length).trimStart()
             : designCode;
-            setGeneratedCode(() => formattedCode);
+        formattedCode = formattedCode.replace(/\[\[MODE:(CODE|CHAT)\]\]/gi, "").trim();
+        if (formattedCode.endsWith("```")) {
+          formattedCode = formattedCode.slice(0, -3).trim();
+        }
+        setGeneratedCode(() => formattedCode);
       } else {
         setGeneratedCode("");
       }
@@ -121,9 +126,10 @@ function Playground() {
     abortControllerRef.current = abortController;
 
     // 5.4 — Abort request after 5 minutes
+    let isTimeout = false;
     const timeoutId = setTimeout(() => {
+      isTimeout = true;
       abortController.abort();
-      toast.error("Generation is taking too long. Please try again.");
     }, 300000);
    
     try {
@@ -206,6 +212,7 @@ function Playground() {
             rawResponse += text;
 
             let cleanedText = rawResponse;
+            cleanedText = cleanedText.replace(/\[\[MODE:(CODE|CHAT)\]\]/gi, "");
             if (mode === "code") {
               cleanedText = cleanedText.trimStart();
               if (cleanedText.startsWith("```html")) {
@@ -265,13 +272,28 @@ function Playground() {
       }
     } catch (error: any) {
       clearTimeout(timeoutId);
-      if (error.name === "AbortError") {
+      if (error.name === "AbortError" && !isTimeout) {
         console.log("Request aborted.");
         return;
       }
       console.error("Error:", error);
+
+      if (!frameDetail?.designCode) {
+        try {
+          const loadingToastId = toast.loading("Refunding your credit...");
+          await axios.post("/api/projects/refund", { projectId });
+          toast.dismiss(loadingToastId);
+          toast.success("Generation failed. Your credit has been refunded.");
+          router.push("/workspace");
+          return;
+        } catch (refundError) {
+          toast.dismiss();
+          console.error("Failed to refund credit:", refundError);
+        }
+      }
+
       // 4.12 — Surface the failure visually with a toast, not just a chat message
-      toast.error("Generation failed. Please try again.");
+      toast.error(isTimeout ? "Generation timed out. Please try again." : "Generation failed. Please try again.");
       setMessages((prev: any) => [
         ...(prev || []),
         {

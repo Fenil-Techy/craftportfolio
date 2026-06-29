@@ -58,13 +58,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5.8 — Multi-model fallback chain: Selected Model -> Gemma 4 26B -> Qwen 3 235B
+    // 5.8 — Multi-model fallback chain: Selected Model -> Gemini 2.5 Flash -> Qwen 2.5 Coder 32B
     const fallbackChain = [model];
-    if (!fallbackChain.includes("google/gemma-4-26b-a4b-it")) {
-      fallbackChain.push("google/gemma-4-26b-a4b-it");
+    if (!fallbackChain.includes("google/gemini-2.5-flash")) {
+      fallbackChain.push("google/gemini-2.5-flash");
     }
-    if (!fallbackChain.includes("qwen/qwen3-235b-a22b-2507")) {
-      fallbackChain.push("qwen/qwen3-235b-a22b-2507");
+    if (!fallbackChain.includes("qwen/qwen-2.5-coder-32b-instruct")) {
+      fallbackChain.push("qwen/qwen-2.5-coder-32b-instruct");
     }
 
     let mode: "code" | "chat" = "chat";
