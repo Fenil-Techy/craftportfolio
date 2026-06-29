@@ -4,7 +4,7 @@ import { Sparkles, Check } from 'lucide-react'
 
 function HowItWorks() {
   return (
-    <section id="features" className="w-full py-20 bg-transparent relative">
+    <section id="features" className="w-full py-20 bg-transparent relative scroll-reveal">
       
       {/* Meet Section / Split Feature Layout */}
       <div className="mx-auto max-w-5xl px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
