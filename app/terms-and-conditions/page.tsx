@@ -1,0 +1,221 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Terms and Conditions',
+  description: 'Read the Terms and Conditions for using CraftPortfolio — the AI portfolio builder.',
+  alternates: {
+    canonical: 'https://www.craftportfolio.online/terms-and-conditions',
+  },
+}
+
+export default function TermsAndConditions() {
+  return (
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
+    >
+      {/* Header */}
+      <div
+        className="border-b"
+        style={{ borderColor: 'var(--color-border-base)', backgroundColor: 'var(--color-bg-surface)' }}
+      >
+        <div className="mx-auto max-w-4xl px-6 py-16">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+            style={{ color: 'var(--color-text-tertiary)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Back to Home
+          </Link>
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.2)' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M5 3h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#fbbf24" strokeWidth="1.4"/>
+                <path d="M7 7h6M7 10h6M7 13h4" stroke="#fbbf24" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <span className="text-sm font-medium" style={{ color: 'var(--color-brand)' }}>Legal</span>
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
+            Terms &amp; Conditions
+          </h1>
+          <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
+            Last updated: June 29, 2026 · Please read these terms carefully before using our service.
+          </p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="mx-auto max-w-4xl px-6 py-16">
+        <div className="space-y-12">
+
+          <Section title="1. Acceptance of Terms">
+            <p>
+              By accessing or using CraftPortfolio (&quot;the Service&quot;) at{' '}
+              <a href="https://www.craftportfolio.online" className="text-brand-link" style={{ color: 'var(--color-brand)' }}>
+                www.craftportfolio.online
+              </a>
+              , you agree to be bound by these Terms and Conditions. If you do not agree to any part of these terms, you may not use our Service.
+            </p>
+          </Section>
+
+          <Section title="2. Description of Service">
+            <p>
+              CraftPortfolio is an AI-powered portfolio website builder that allows users to generate, customize, and publish professional portfolio websites by providing natural language prompts.
+            </p>
+            <p>
+              We reserve the right to modify, suspend, or discontinue the Service at any time without prior notice. We will not be liable to you or any third party for any modification, suspension, or discontinuation of the Service.
+            </p>
+          </Section>
+
+          <Section title="3. User Accounts">
+            <ul>
+              <li>You must be at least 13 years old to create an account.</li>
+              <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+              <li>You are responsible for all activities that occur under your account.</li>
+              <li>You must provide accurate and complete information when registering.</li>
+              <li>You must notify us immediately of any unauthorized use of your account.</li>
+            </ul>
+          </Section>
+
+          <Section title="4. User Content">
+            <p>
+              When you submit content (prompts, portfolio descriptions, text) to CraftPortfolio:
+            </p>
+            <ul>
+              <li>You retain ownership of your original content.</li>
+              <li>You grant us a non-exclusive, royalty-free license to use, process, and display your content to provide the Service.</li>
+              <li>You represent that your content does not violate any third-party intellectual property rights.</li>
+              <li>You agree not to submit content that is unlawful, harmful, defamatory, or obscene.</li>
+            </ul>
+          </Section>
+
+          <Section title="5. AI-Generated Content">
+            <p>
+              The portfolios and content generated by our AI are provided &quot;as is.&quot; You understand that:
+            </p>
+            <ul>
+              <li>AI-generated content may not always be accurate or complete.</li>
+              <li>You are responsible for reviewing and verifying all AI-generated content before publishing.</li>
+              <li>CraftPortfolio does not claim ownership over AI-generated portfolios created using your prompts.</li>
+              <li>We are not responsible for how third parties interpret or react to your published portfolio.</li>
+            </ul>
+          </Section>
+
+          <Section title="6. Payment and Credits">
+            <ul>
+              <li>Some features require the purchase of credits or a subscription plan.</li>
+              <li>All payments are processed securely through Stripe.</li>
+              <li>Credits are non-refundable once consumed.</li>
+              <li>Subscription fees are billed according to your chosen plan cycle.</li>
+              <li>We reserve the right to change pricing with 30 days&apos; notice.</li>
+              <li>Refund requests are handled at our discretion within 7 days of purchase.</li>
+            </ul>
+          </Section>
+
+          <Section title="7. Prohibited Conduct">
+            <p>You agree not to:</p>
+            <ul>
+              <li>Use the Service for any unlawful purpose or in violation of these Terms.</li>
+              <li>Attempt to reverse engineer, decompile, or extract source code from the Service.</li>
+              <li>Use automated bots, scrapers, or scripts to access the Service without written permission.</li>
+              <li>Attempt to gain unauthorized access to our systems or networks.</li>
+              <li>Interfere with or disrupt the integrity or performance of the Service.</li>
+              <li>Generate or distribute spam, malware, or harmful content through the Service.</li>
+              <li>Impersonate any person or entity.</li>
+            </ul>
+          </Section>
+
+          <Section title="8. Intellectual Property">
+            <p>
+              The Service, including its original content, features, and functionality, is owned by CraftPortfolio and is protected by international copyright, trademark, and other intellectual property laws. Our name, logo, and all related names, logos, product names, and slogans are trademarks of CraftPortfolio.
+            </p>
+          </Section>
+
+          <Section title="9. Disclaimer of Warranties">
+            <p>
+              THE SERVICE IS PROVIDED ON AN &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, CRAFTPORTFOLIO DISCLAIMS ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+            </p>
+          </Section>
+
+          <Section title="10. Limitation of Liability">
+            <p>
+              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, CRAFTPORTFOLIO SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOSS OF PROFITS, DATA, OR GOODWILL, ARISING FROM YOUR USE OR INABILITY TO USE THE SERVICE.
+            </p>
+          </Section>
+
+          <Section title="11. Termination">
+            <p>
+              We may terminate or suspend your account at our sole discretion, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties. Upon termination, your right to use the Service ceases immediately.
+            </p>
+          </Section>
+
+          <Section title="12. Governing Law">
+            <p>
+              These Terms are governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in India.
+            </p>
+          </Section>
+
+          <Section title="13. Changes to Terms">
+            <p>
+              We reserve the right to modify these Terms at any time. We will provide notice of significant changes by updating the &quot;Last updated&quot; date. Your continued use of the Service after changes constitutes acceptance of the new Terms.
+            </p>
+          </Section>
+
+          <Section title="14. Contact Us">
+            <p>
+              If you have questions about these Terms, please contact us at:
+            </p>
+            <div
+              className="mt-4 p-5 rounded-xl"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-base)',
+              }}
+            >
+              <p className="font-semibold text-sm mb-1" style={{ color: 'var(--color-text-primary)' }}>CraftPortfolio</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Email:{' '}
+                <a
+                  href="mailto:fenilkapopara34@gmail.com"
+                  style={{ color: 'var(--color-brand)' }}
+                  className="hover:underline"
+                >
+                  fenilkapopara34@gmail.com
+                </a>
+              </p>
+            </div>
+          </Section>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h2
+        className="text-xl font-semibold mb-4 pb-3"
+        style={{
+          color: 'var(--color-text-primary)',
+          borderBottom: '1px solid var(--color-border-base)',
+          fontFamily: 'var(--font-inter, sans-serif)',
+        }}
+      >
+        {title}
+      </h2>
+      <div className="space-y-3 text-sm leading-7" style={{ color: 'var(--color-text-secondary)' }}>
+        {children}
+      </div>
+    </section>
+  )
+}
