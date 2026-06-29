@@ -12,7 +12,7 @@ function Benefits() {
   ]
 
   return (
-    <section className="w-full py-20 bg-transparent relative">
+    <section className="w-full py-20 bg-transparent relative scroll-reveal">
       <div className="mx-auto max-w-5xl px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         
         {/* Left Column: Outcome Copy */}

@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react'
 
 function CTA() {
   return (
-    <section className="w-full py-16 bg-transparent">
+    <section className="w-full py-16 bg-transparent scroll-reveal">
       <div className="mx-auto max-w-5xl px-6">
         
         {/* Glowing Gradient Banner Container */}

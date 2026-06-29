@@ -113,16 +113,7 @@ function Hero() {
     { label: "Startup Founder",   prompt: "Create a personal portfolio for a Startup Founder highlighting journey, startups, products, achievements and contact section.", icon: Rocket },
   ];
 
-  if (!isLoaded) {
-    return (
-      <div className='flex items-center justify-center h-[80vh]'>
-        <div className="flex flex-col items-center gap-4">
-          <Loader />
-          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Loading…</p>
-        </div>
-      </div>
-    )
-  }
+
 
   const inputCharCount = userInput?.length ?? 0;
   const inputValid = (userInput?.trim().length ?? 0) >= 10;

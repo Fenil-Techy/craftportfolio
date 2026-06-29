@@ -2,19 +2,11 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs'
 import { dark } from '@clerk/ui/themes'
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "CraftPortfolio — AI Portfolio Builder",
@@ -53,7 +45,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`} style={{backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)'}}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans antialiased" style={{backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)'}}>
       <ClerkProvider
     appearance={{
     theme: dark,

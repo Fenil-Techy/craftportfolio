@@ -7,10 +7,12 @@ import Testimonials from "./_components/Testimonials";
 import FAQ from "./_components/FAQ";
 import CTA from "./_components/CTA";
 import Footer from "./_components/Footer";
+import ScrollObserver from "./_components/ScrollObserver";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden bg-lovable-mesh">
+      <ScrollObserver />
       <Header />
       <main className="flex flex-1 flex-col pt-16">
           <Hero />
